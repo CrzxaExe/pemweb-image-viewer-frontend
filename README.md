@@ -25,11 +25,15 @@ See [Vite Configuration Reference](https://vite.dev/config/).
 
 ## Project Setup
 
+Installing dependencies:
+
 ```sh
 bun install
 ```
 
 ### Compile and Hot-Reload for Development
+
+Running app dev mode:
 
 ```sh
 bun dev
@@ -39,4 +43,18 @@ bun dev
 
 ```sh
 bun run build
+```
+
+## Project Setup Nodejs
+
+Installing dependencies:
+
+```sh
+npm install
+```
+
+Running app dev mode:
+
+```sh
+npm dev
 ```
