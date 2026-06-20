@@ -1,0 +1,41 @@
+import { defineStore } from 'pinia'
+
+interface LoginPayload {
+  username: string
+  password: string
+}
+
+export const useAuthStore = defineStore('auth', {
+  state: () => ({
+    isLoggedIn: false,
+    loading: false,
+    error: '',
+  }),
+
+  actions: {
+    async login(data: LoginPayload) {
+      this.loading = true
+      this.error = ''
+
+      try {
+        // sementara dummy login
+        if (data.username && data.password) {
+          this.isLoggedIn = true
+          return true
+        }
+
+        this.error = 'Username atau password salah'
+        return false
+      } catch {
+        this.error = 'Login gagal'
+        return false
+      } finally {
+        this.loading = false
+      }
+    },
+
+    async logout() {
+      this.isLoggedIn = false
+    }
+  }
+})
