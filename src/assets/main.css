@@ -1,1 +1,17 @@
+@font-face {
+  font-family: "NuberNext DemiBold Condensed";
+  src: url("https://db.onlinewebfonts.com/t/a33dc307072ee32208b52c76f9532a88.eot");
+  src:
+    url("https://db.onlinewebfonts.com/t/a33dc307072ee32208b52c76f9532a88.eot?#iefix")
+      format("embedded-opentype"),
+    url("https://db.onlinewebfonts.com/t/a33dc307072ee32208b52c76f9532a88.woff2")
+      format("woff2"),
+    url("https://db.onlinewebfonts.com/t/a33dc307072ee32208b52c76f9532a88.woff")
+      format("woff"),
+    url("https://db.onlinewebfonts.com/t/a33dc307072ee32208b52c76f9532a88.ttf")
+      format("truetype"),
+    url("https://db.onlinewebfonts.com/t/a33dc307072ee32208b52c76f9532a88.svg#NuberNext DemiBold Condensed")
+      format("svg");
+}
+
 @import "tailwindcss";

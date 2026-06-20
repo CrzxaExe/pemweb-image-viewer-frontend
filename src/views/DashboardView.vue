@@ -1,7 +1,16 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 
-const isLoaded = ref(false)
+const isLoaded = ref<boolean>(false)
+const images = ref([]);
+
+const fetchDashboard = async () => {
+  const res = await fetch("https://zxfile-backend-express.vercel.app/image/dashboard");
+  const json = await res.json()
+
+  images.value = json;
+  console.log(json)
+}
 
 // Data dummy daftar gambar yang sudah diupload (nanti ditarik dari API Bun)
 const uploadedImages = ref([
@@ -11,8 +20,10 @@ const uploadedImages = ref([
   { id: 4, name: 'Minimalist Setup.png', url: 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=500', size: '2.1 MB', date: '05 Jun 2026' },
 ])
 
-onMounted(() => {
+onMounted(async () => {
   isLoaded.value = true
+
+  await fetchDashboard()
 })
 
 const deleteImage = (id: number) => {
