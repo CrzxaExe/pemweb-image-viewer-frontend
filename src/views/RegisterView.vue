@@ -1,44 +1,59 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
+import { useAuthStore } from '@/stores/auth'
+
+const router = useRouter()
+const auth = useAuthStore()
 
 const isLoaded = ref(false)
-const name = ref('')
+const username = ref('')
 const email = ref('')
 const password = ref('')
 const confirmPassword = ref('')
 const agreeToTerms = ref(false)
-const isSubmitting = ref(false)
-const errorMessage = ref('')
+const showPassword = ref(false)
+const successMessage = ref('')
 
 onMounted(() => {
   isLoaded.value = true
 })
 
 async function handleSubmit() {
-  errorMessage.value = ''
+  auth.error = null
+  successMessage.value = ''
 
-  if (!name.value || !email.value || !password.value || !confirmPassword.value) {
-    errorMessage.value = 'Semua field wajib diisi.'
+  if (!username.value || !email.value || !password.value || !confirmPassword.value) {
+    auth.error = 'Semua field wajib diisi.'
+    return
+  }
+  if (username.value.length < 6) {
+    auth.error = 'Username minimal 6 karakter.'
+    return
+  }
+  if (password.value.length < 8) {
+    auth.error = 'Password minimal 8 karakter.'
     return
   }
   if (password.value !== confirmPassword.value) {
-    errorMessage.value = 'Password dan konfirmasi password tidak sama.'
+    auth.error = 'Password dan konfirmasi password tidak sama.'
     return
   }
   if (!agreeToTerms.value) {
-    errorMessage.value = 'Anda harus menyetujui syarat & ketentuan.'
+    auth.error = 'Anda harus menyetujui syarat & ketentuan.'
     return
   }
 
-  isSubmitting.value = true
-  try {
-    // TODO: ganti dengan panggilan API register asli
-    await new Promise((resolve) => setTimeout(resolve, 1200))
-    console.log('Register submitted:', { name: name.value, email: email.value })
-  } catch (err) {
-    errorMessage.value = 'Gagal membuat akun. Silakan coba lagi.'
-  } finally {
-    isSubmitting.value = false
+  const success = await auth.register({
+    username: username.value,
+    email: email.value,
+    password: password.value,
+  })
+
+  if (success) {
+    // Backend tidak auto-login setelah register, jadi arahkan ke /login
+    successMessage.value = 'Akun berhasil dibuat! Mengarahkan ke halaman login...'
+    setTimeout(() => router.push('/login'), 1500)
   }
 }
 </script>
@@ -82,14 +97,14 @@ async function handleSubmit() {
             <p class="card-subtitle">Lengkapi data di bawah untuk mendaftar.</p>
 
             <div class="form-group">
-              <label class="form-label" for="name">Nama Lengkap</label>
+              <label class="form-label" for="username">Username</label>
               <input
-                id="name"
-                v-model="name"
+                id="username"
+                v-model="username"
                 type="text"
                 class="form-input"
-                placeholder="John Doe"
-                autocomplete="name"
+                placeholder="minimal 6 karakter"
+                autocomplete="username"
               />
             </div>
 
@@ -107,14 +122,19 @@ async function handleSubmit() {
 
             <div class="form-group">
               <label class="form-label" for="password">Password</label>
-              <input
-                id="password"
-                v-model="password"
-                type="password"
-                class="form-input"
-                placeholder="••••••••"
-                autocomplete="new-password"
-              />
+              <div class="input-wrapper">
+                <input
+                  id="password"
+                  v-model="password"
+                  :type="showPassword ? 'text' : 'password'"
+                  class="form-input"
+                  placeholder="minimal 8 karakter"
+                  autocomplete="new-password"
+                />
+                <button class="eye-btn" type="button" @click="showPassword = !showPassword" :aria-label="showPassword ? 'Hide password' : 'Show password'">
+                  {{ showPassword ? '🙈' : '👁️' }}
+                </button>
+              </div>
             </div>
 
             <div class="form-group">
@@ -122,9 +142,9 @@ async function handleSubmit() {
               <input
                 id="confirm-password"
                 v-model="confirmPassword"
-                type="password"
+                :type="showPassword ? 'text' : 'password'"
                 class="form-input"
-                placeholder="••••••••"
+                placeholder="ulangi password"
                 autocomplete="new-password"
               />
             </div>
@@ -136,15 +156,16 @@ async function handleSubmit() {
               </label>
             </div>
 
-            <p v-if="errorMessage" class="error-text">{{ errorMessage }}</p>
+            <p v-if="auth.error" class="error-text">{{ auth.error }}</p>
+            <p v-if="successMessage" class="success-text">{{ successMessage }}</p>
 
-            <button type="submit" class="submit-btn" :disabled="isSubmitting">
-              {{ isSubmitting ? 'Creating account...' : 'Sign Up' }}
+            <button type="submit" class="submit-btn" :disabled="auth.loading">
+              {{ auth.loading ? 'Creating account...' : 'Sign Up' }}
             </button>
 
             <p class="switch-auth">
               Sudah punya akun?
-              <a href="#" class="switch-link">Masuk di sini</a>
+              <router-link to="/login" class="switch-link">Masuk di sini</router-link>
             </p>
           </form>
         </div>
@@ -288,6 +309,9 @@ async function handleSubmit() {
   margin-bottom: 6px;
   letter-spacing: 0.3px;
 }
+.input-wrapper {
+  position: relative;
+}
 .form-input {
   width: 100%;
   background: #0d0d0d;
@@ -305,6 +329,17 @@ async function handleSubmit() {
 }
 .form-input::placeholder {
   color: #444444;
+}
+.eye-btn {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 0.9rem;
+  line-height: 1;
 }
 .form-meta {
   margin-bottom: 20px;
@@ -330,6 +365,11 @@ async function handleSubmit() {
 }
 .error-text {
   color: #ff5c5c;
+  font-size: 0.8rem;
+  margin: -8px 0 16px 0;
+}
+.success-text {
+  color: #22c55e;
   font-size: 0.8rem;
   margin: -8px 0 16px 0;
 }
