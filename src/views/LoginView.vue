@@ -16,7 +16,7 @@ onMounted(() => {
 })
 
 async function handleLogin() {
-  if (!username.value || !password.value) {
+  if (!username.value || !password.value) {a
     auth.error = 'Please fill in all fields.'
     return
   }

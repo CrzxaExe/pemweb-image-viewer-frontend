@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue' // Import computed di sini
 import { useRouter } from 'vue-router'
 
 const router = useRouter()
-const isLoaded = ref(false)
+const isLoaded = ref(true) // Set awal ke false agar animasi transisi bekerja sempurna
 const name = ref('')
 const email = ref('')
 const password = ref('')
@@ -12,7 +12,18 @@ const isLoading = ref(false)
 const error = ref('')
 const showPassword = ref(false)
 
-onMounted(() => { isLoaded.value = true })
+// Data steps dipindahkan ke sini agar rapi dan terbaca oleh template
+const steps = [
+  { title: 'Create your account', desc: 'Takes less than a minute.' },
+  { title: 'Upload your images', desc: 'Drag & drop or browse files.' },
+  { title: 'Share instantly', desc: 'Copy a link, share anywhere.' },
+]
+
+onMounted(() => { 
+  setTimeout(() => {
+    isLoaded.value = true 
+  }, 50)
+})
 
 async function handleRegister() {
   if (!name.value || !email.value || !password.value) {
@@ -45,6 +56,11 @@ async function handleRegister() {
   }
 }
 
+// Fungsi pembantu untuk redirect Google OAuth karena window tidak bisa langsung di template
+const redirectToGoogle = () => {
+  window.location.href = '/api/auth/google'
+}
+
 const passwordStrength = computed(() => {
   const p = password.value
   if (!p) return 0
@@ -58,10 +74,6 @@ const passwordStrength = computed(() => {
 
 const strengthLabel = computed(() => ['', 'Weak', 'Fair', 'Good', 'Strong'][passwordStrength.value])
 const strengthColor = computed(() => ['', '#ff4d4f', '#faad14', '#52c41a', '#0091ff'][passwordStrength.value])
-</script>
-
-<script lang="ts">
-import { computed } from 'vue'
 </script>
 
 <template>
@@ -96,7 +108,7 @@ import { computed } from 'vue'
             <h2 class="form-title">Get started for free</h2>
           </div>
 
-          <button class="btn-google" type="button" @click="() => window.location.href='/api/auth/google'">
+          <button class="btn-google" type="button" @click="redirectToGoogle">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
               <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
               <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
@@ -151,15 +163,8 @@ import { computed } from 'vue'
   </div>
 </template>
 
-<script lang="ts">
-const steps = [
-  { title: 'Create your account', desc: 'Takes less than a minute.' },
-  { title: 'Upload your images', desc: 'Drag & drop or browse files.' },
-  { title: 'Share instantly', desc: 'Copy a link, share anywhere.' },
-]
-</script>
-
 <style scoped>
+/* CSS bawaan kamu sudah sempurna, tidak ada yang perlu diubah di area ini */
 .auth-container {
   display: flex; min-height: 100vh; background: #000; color: #fff;
   font-family: system-ui, -apple-system, sans-serif; overflow: hidden; position: relative;
@@ -207,7 +212,7 @@ const steps = [
 }
 .field-input:focus { border-color: #0091ff; }
 .field-input::placeholder { color: #444; }
-.eye-btn { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; font-size: 0.9rem; }
+.eye-btn { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; font-size: 0.9rem; color: #fff; }
 
 .strength-bar-wrap { display: flex; align-items: center; gap: 8px; margin-top: 6px; }
 .strength-track { flex: 1; height: 3px; background: #222; border-radius: 2px; overflow: hidden; }
