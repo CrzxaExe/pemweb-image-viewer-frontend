@@ -1,13 +1,13 @@
-<script setup lang="ts">
+<script setup>
 import { ref } from 'vue'
 import axios from 'axios'
 import { useImageStore } from '@/stores/imageStore'
 
-const selectedFile = ref<File | null>(null)
+const selectedFile = ref(null)
 const imageStore = useImageStore()
 
-const onFileChange = (e: Event) => {
-  const target = e.target as HTMLInputElement
+const onFileChange = (e) => {
+  const target = e.target
   if (target.files && target.files.length > 0) {
     selectedFile.value = target.files[0]
   }
@@ -20,7 +20,7 @@ const handleUpload = async () => {
   formData.append('image', selectedFile.value)
 
   try {
-    await axios.post('http://127.0.0.1:8000/api/upload', formData, {
+    await axios.post('https://zxfile-backend-express.vercel.app/drive/upload', formData, {
       headers: { 'Content-Type': 'multipart/form-data' }
     })
     selectedFile.value = null

@@ -22,12 +22,14 @@ async function handleLogin() {
   isLoading.value = true
   error.value = ''
   try {
-    // TODO: ganti dengan actual API call ke Elysia.js backend
-    const res = await fetch('/api/auth/login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email: email.value, password: password.value }),
-    })
+    const res = await fetch("https://zxfile-backend-express.vercel.app/auth/login", {
+      method: "POST",
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json' // Tells the server what format you expect back
+      },
+      body: JSON.stringify({ email: email.value, password: password.value })
+    });
     const data = await res.json()
     if (!res.ok) throw new Error(data.message || 'Login failed.')
     localStorage.setItem('token', data.token)
