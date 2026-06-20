@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 
-const isLoaded = ref(false)
+const isLoaded = ref(true)
 
 onMounted(() => {
   // Memicu animasi setelah komponen berhasil dimuat di browser
@@ -11,10 +11,10 @@ onMounted(() => {
 
 <template>
   <div class="landing-container">
-
+    
     <div class="hero-left">
       <div class="dot-grid"></div>
-
+      
       <div class="vertical-badge">
         <span class="badge-text">WHAT A THING</span>
       </div>
@@ -22,12 +22,12 @@ onMounted(() => {
       <Transition name="slide-up">
         <div v-if="isLoaded" class="hero-content">
           <div class="icon-placeholder-box"></div>
-
+          
           <h1 class="main-title">
             Image Everywhere <br />
             for <span class="text-neon-blue">Everyone</span>
           </h1>
-
+          
           <p class="sub-title">
             Share your image to everyone without them need to worry about need downloaded first.
           </p>
@@ -43,7 +43,7 @@ onMounted(() => {
     <div class="hero-right">
       <Transition name="slide-up-delayed">
         <div v-if="isLoaded" class="stacked-gallery">
-
+          
           <div class="main-image-wrapper">
             <div class="image-placeholder main-pic">
               <span>MAIN IMAGE PLACEHOLDER</span>

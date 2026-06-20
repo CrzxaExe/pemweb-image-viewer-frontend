@@ -1,4 +1,5 @@
 import { defineStore } from 'pinia'
+import { ref } from "vue";
 
 interface LoginPayload {
   username: string
@@ -18,7 +19,6 @@ export const useAuthStore = defineStore('auth', {
       this.error = ''
 
       try {
-        // sementara dummy login
         if (data.username && data.password) {
           this.isLoggedIn = true
           return true

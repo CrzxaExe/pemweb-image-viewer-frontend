@@ -6,7 +6,7 @@ import { useAuthStore } from '@/stores/auth'
 const router = useRouter()
 const auth = useAuthStore()
 
-const isLoaded = ref(false)
+const isLoaded = ref(true)
 const username = ref('')
 const password = ref('')
 const showPassword = ref(false)
@@ -30,7 +30,7 @@ async function handleLogin() {
   })
 
   if (success) {
-    router.push('/dashboard')
+    router.push('/home')  // Redirect ke halaman home setelah login berhasil
   }
 }
 

@@ -7,10 +7,6 @@ import { useAuthStore } from '@/stores/auth'
 const auth = useAuthStore()
 
 onMounted(() => {
-  // Dipanggil sekali tiap kali app dibuka/refresh.
-  // Mengecek ke backend lewat cookie session: "apakah user ini masih login?"
-  // Tanpa ini, refresh halaman akan selalu kelihatan seperti belum login,
-  // walaupun cookie session-nya masih ada dan valid.
   auth.fetchSession()
 })
 </script>

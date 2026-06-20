@@ -17,14 +17,14 @@ const handleLogout = async () => {
 
       <!-- Logo -->
       <div class="brand">
-        <RouterLink to="/">
+        <RouterLink to="/home">
           <div class="logo-placeholder">
             <span class="logo-icon">
               <img src="../assets/logo.svg" alt="Logo">
             </span>
 
             <span class="logo-text">
-              Image Viewer
+              PixNest
             </span>
           </div>
         </RouterLink>
@@ -36,7 +36,7 @@ const handleLogout = async () => {
         <!-- BELUM LOGIN -->
         <template v-if="!auth.isLoggedIn">
 
-          <RouterLink to="/" active-class="active">
+          <RouterLink to="/home" active-class="active">
             HOME
           </RouterLink>
 
@@ -49,7 +49,7 @@ const handleLogout = async () => {
         <!-- SUDAH LOGIN -->
         <template v-else>
 
-          <RouterLink to="/" active-class="active">
+          <RouterLink to="/home" active-class="active">
             UPLOAD
           </RouterLink>
 
