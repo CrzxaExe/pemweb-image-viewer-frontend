@@ -49,7 +49,7 @@ const handleLogout = async () => {
         <!-- SUDAH LOGIN -->
         <template v-else>
 
-          <RouterLink to="/home" active-class="active">
+          <RouterLink to="/upload" active-class="active">
             UPLOAD
           </RouterLink>
 
