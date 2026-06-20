@@ -1,443 +1,241 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { useAuthStore } from '@/stores/auth'
 
 const router = useRouter()
-const auth = useAuthStore()
-
 const isLoaded = ref(false)
-const username = ref('')
+const name = ref('')
 const email = ref('')
 const password = ref('')
 const confirmPassword = ref('')
-const agreeToTerms = ref(false)
+const isLoading = ref(false)
+const error = ref('')
 const showPassword = ref(false)
-const successMessage = ref('')
 
-onMounted(() => {
-  isLoaded.value = true
-})
+onMounted(() => { isLoaded.value = true })
 
-async function handleSubmit() {
-  auth.error = null
-  successMessage.value = ''
-
-  if (!username.value || !email.value || !password.value || !confirmPassword.value) {
-    auth.error = 'Semua field wajib diisi.'
-    return
-  }
-  if (username.value.length < 6) {
-    auth.error = 'Username minimal 6 karakter.'
-    return
-  }
-  if (password.value.length < 8) {
-    auth.error = 'Password minimal 8 karakter.'
+async function handleRegister() {
+  if (!name.value || !email.value || !password.value) {
+    error.value = 'All fields are required.'
     return
   }
   if (password.value !== confirmPassword.value) {
-    auth.error = 'Password dan konfirmasi password tidak sama.'
+    error.value = 'Passwords do not match.'
     return
   }
-  if (!agreeToTerms.value) {
-    auth.error = 'Anda harus menyetujui syarat & ketentuan.'
+  if (password.value.length < 8) {
+    error.value = 'Password must be at least 8 characters.'
     return
   }
-
-  const success = await auth.register({
-    username: username.value,
-    email: email.value,
-    password: password.value,
-  })
-
-  if (success) {
-    // Backend tidak auto-login setelah register, jadi arahkan ke /login
-    successMessage.value = 'Akun berhasil dibuat! Mengarahkan ke halaman login...'
-    setTimeout(() => router.push('/login'), 1500)
+  isLoading.value = true
+  error.value = ''
+  try {
+    const res = await fetch('/api/auth/register', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name: name.value, email: email.value, password: password.value }),
+    })
+    const data = await res.json()
+    if (!res.ok) throw new Error(data.message || 'Registration failed.')
+    router.push('/login?registered=1')
+  } catch (err: any) {
+    error.value = err.message
+  } finally {
+    isLoading.value = false
   }
 }
+
+const passwordStrength = computed(() => {
+  const p = password.value
+  if (!p) return 0
+  let s = 0
+  if (p.length >= 8) s++
+  if (/[A-Z]/.test(p)) s++
+  if (/[0-9]/.test(p)) s++
+  if (/[^A-Za-z0-9]/.test(p)) s++
+  return s
+})
+
+const strengthLabel = computed(() => ['', 'Weak', 'Fair', 'Good', 'Strong'][passwordStrength.value])
+const strengthColor = computed(() => ['', '#ff4d4f', '#faad14', '#52c41a', '#0091ff'][passwordStrength.value])
+</script>
+
+<script lang="ts">
+import { computed } from 'vue'
 </script>
 
 <template>
-  <div class="landing-container">
+  <div class="auth-container">
+    <div class="dot-grid"></div>
 
-    <div class="hero-left">
-      <div class="dot-grid"></div>
-
-      <div class="vertical-badge">
-        <span class="badge-text">WHAT A THING</span>
-      </div>
-
+    <div class="auth-left">
       <Transition name="slide-up">
-        <div v-if="isLoaded" class="hero-content">
-          <div class="icon-placeholder-box"></div>
-
-          <h1 class="main-title">
-            Join Image Everywhere <br />
-            for <span class="text-neon-blue">Everyone</span>
-          </h1>
-
-          <p class="sub-title">
-            Buat akun untuk mulai membagikan gambar ke siapa saja, tanpa ribet download.
-          </p>
-
-          <div class="bg-watermark">
-            <h2>SIGN UP</h2>
-            <h2>SIGN UP</h2>
+        <div v-if="isLoaded" class="brand-block">
+          <div class="logo-box"></div>
+          <h1 class="brand-title">Join <span class="text-neon-blue">PixNest</span></h1>
+          <p class="brand-sub">Start hosting your images in seconds. No credit card required.</p>
+          <div class="step-list">
+            <div class="step" v-for="(s, i) in steps" :key="i">
+              <span class="step-num">0{{ i + 1 }}</span>
+              <div>
+                <div class="step-title">{{ s.title }}</div>
+                <div class="step-desc">{{ s.desc }}</div>
+              </div>
+            </div>
           </div>
         </div>
       </Transition>
     </div>
 
-    <div class="hero-right">
+    <div class="auth-right">
+      <div class="clip-bg"></div>
       <Transition name="slide-up-delayed">
-        <div v-if="isLoaded" class="auth-card-wrapper">
-          <form class="auth-card" @submit.prevent="handleSubmit">
-            <h2 class="card-title">Create Account</h2>
-            <p class="card-subtitle">Lengkapi data di bawah untuk mendaftar.</p>
+        <div v-if="isLoaded" class="form-card">
+          <div class="form-header">
+            <span class="form-eyebrow">CREATE ACCOUNT</span>
+            <h2 class="form-title">Get started for free</h2>
+          </div>
 
-            <div class="form-group">
-              <label class="form-label" for="username">Username</label>
-              <input
-                id="username"
-                v-model="username"
-                type="text"
-                class="form-input"
-                placeholder="minimal 6 karakter"
-                autocomplete="username"
-              />
+          <button class="btn-google" type="button" @click="() => window.location.href='/api/auth/google'">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+              <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+              <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+              <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/>
+              <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+            </svg>
+            Sign up with Google
+          </button>
+
+          <div class="divider"><span>or</span></div>
+
+          <div class="field-group">
+            <label class="field-label">Full Name</label>
+            <input v-model="name" type="text" class="field-input" placeholder="John Doe" autocomplete="name" />
+          </div>
+          <div class="field-group">
+            <label class="field-label">Email</label>
+            <input v-model="email" type="email" class="field-input" placeholder="you@example.com" autocomplete="email" />
+          </div>
+          <div class="field-group">
+            <label class="field-label">Password</label>
+            <div class="input-wrapper">
+              <input v-model="password" :type="showPassword ? 'text' : 'password'" class="field-input" placeholder="Min. 8 characters" />
+              <button class="eye-btn" type="button" @click="showPassword = !showPassword">{{ showPassword ? '🙈' : '👁️' }}</button>
             </div>
-
-            <div class="form-group">
-              <label class="form-label" for="email">Email</label>
-              <input
-                id="email"
-                v-model="email"
-                type="email"
-                class="form-input"
-                placeholder="you@example.com"
-                autocomplete="email"
-              />
-            </div>
-
-            <div class="form-group">
-              <label class="form-label" for="password">Password</label>
-              <div class="input-wrapper">
-                <input
-                  id="password"
-                  v-model="password"
-                  :type="showPassword ? 'text' : 'password'"
-                  class="form-input"
-                  placeholder="minimal 8 karakter"
-                  autocomplete="new-password"
-                />
-                <button class="eye-btn" type="button" @click="showPassword = !showPassword" :aria-label="showPassword ? 'Hide password' : 'Show password'">
-                  {{ showPassword ? '🙈' : '👁️' }}
-                </button>
+            <div v-if="password" class="strength-bar-wrap">
+              <div class="strength-track">
+                <div class="strength-fill" :style="{ width: (passwordStrength / 4 * 100) + '%', background: strengthColor }"></div>
               </div>
+              <span class="strength-label" :style="{ color: strengthColor }">{{ strengthLabel }}</span>
             </div>
+          </div>
+          <div class="field-group">
+            <label class="field-label">Confirm Password</label>
+            <input v-model="confirmPassword" type="password" class="field-input" placeholder="Repeat password" @keyup.enter="handleRegister" />
+          </div>
 
-            <div class="form-group">
-              <label class="form-label" for="confirm-password">Konfirmasi Password</label>
-              <input
-                id="confirm-password"
-                v-model="confirmPassword"
-                :type="showPassword ? 'text' : 'password'"
-                class="form-input"
-                placeholder="ulangi password"
-                autocomplete="new-password"
-              />
-            </div>
+          <p v-if="error" class="error-msg">{{ error }}</p>
 
-            <div class="form-meta">
-              <label class="remember-me">
-                <input v-model="agreeToTerms" type="checkbox" />
-                <span>Saya menyetujui syarat &amp; ketentuan</span>
-              </label>
-            </div>
+          <button class="btn-primary" @click="handleRegister" :disabled="isLoading">
+            <span v-if="isLoading" class="spinner"></span>
+            <span v-else>Create Account</span>
+          </button>
 
-            <p v-if="auth.error" class="error-text">{{ auth.error }}</p>
-            <p v-if="successMessage" class="success-text">{{ successMessage }}</p>
-
-            <button type="submit" class="submit-btn" :disabled="auth.loading">
-              {{ auth.loading ? 'Creating account...' : 'Sign Up' }}
-            </button>
-
-            <p class="switch-auth">
-              Sudah punya akun?
-              <router-link to="/login" class="switch-link">Masuk di sini</router-link>
-            </p>
-          </form>
+          <p class="register-link">
+            Already have an account?
+            <router-link to="/login" class="link-blue">Sign in</router-link>
+          </p>
         </div>
       </Transition>
     </div>
-
   </div>
 </template>
 
-<style scoped>
-.landing-container {
-  display: flex;
-  min-height: 100vh;
-  background-color: #000000;
-  color: #ffffff;
-  font-family: system-ui, -apple-system, sans-serif;
-  overflow: hidden;
-  position: relative;
-}
+<script lang="ts">
+const steps = [
+  { title: 'Create your account', desc: 'Takes less than a minute.' },
+  { title: 'Upload your images', desc: 'Drag & drop or browse files.' },
+  { title: 'Share instantly', desc: 'Copy a link, share anywhere.' },
+]
+</script>
 
-/* --- KIRI: SENSOR TEKS --- */
-.hero-left {
-  flex: 1.2;
-  position: relative;
-  display: flex;
-  align-items: center;
-  padding-left: 8%;
-  z-index: 2;
+<style scoped>
+.auth-container {
+  display: flex; min-height: 100vh; background: #000; color: #fff;
+  font-family: system-ui, -apple-system, sans-serif; overflow: hidden; position: relative;
 }
 .dot-grid {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-image: radial-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px);
-  background-size: 20px 20px;
-  opacity: 0.5;
-  z-index: -1;
+  position: absolute; inset: 0;
+  background-image: radial-gradient(rgba(255,255,255,0.1) 1px, transparent 1px);
+  background-size: 20px 20px; opacity: 0.5; pointer-events: none; z-index: 0;
 }
-.vertical-badge {
-  position: absolute;
-  left: 3%;
-  top: 40%;
-  transform: rotate(-90deg);
-  transform-origin: left top;
-}
-.badge-text {
-  font-size: 0.65rem;
-  letter-spacing: 4px;
-  color: #0091ff;
-  border-left: 1px solid #0091ff;
-  padding-left: 8px;
-}
-.hero-content {
-  position: relative;
-  max-width: 540px;
-}
-.icon-placeholder-box {
-  width: 32px;
-  height: 32px;
-  border: 3px solid #ffffff;
-  border-radius: 6px;
-  margin-bottom: 24px;
-}
-.main-title {
-  font-size: 3rem;
-  font-weight: 800;
-  line-height: 1.2;
-  margin-bottom: 20px;
-  letter-spacing: -0.5px;
-}
-.text-neon-blue {
-  color: #0091ff;
-  text-shadow: 0 0 20px rgba(0, 145, 255, 0.3);
-}
-.sub-title {
-  color: #94a3b8;
-  font-size: 1rem;
-  line-height: 1.6;
-  max-width: 420px;
-}
-.bg-watermark {
-  position: absolute;
-  bottom: -160px;
-  left: 0;
-  opacity: 0.05;
-  user-select: none;
-  pointer-events: none;
-}
-.bg-watermark h2 {
-  font-size: 4.5rem;
-  font-weight: 900;
-  margin: 0;
-  line-height: 1;
-  -webkit-text-stroke: 1px #ffffff;
-  color: transparent;
-}
+.auth-left { flex: 1.1; display: flex; align-items: center; padding-left: 8%; z-index: 2; }
+.brand-block { max-width: 400px; }
+.logo-box { width: 32px; height: 32px; border: 3px solid #fff; border-radius: 6px; margin-bottom: 24px; }
+.brand-title { font-size: 2.4rem; font-weight: 800; margin-bottom: 10px; }
+.text-neon-blue { color: #0091ff; text-shadow: 0 0 20px rgba(0,145,255,0.3); }
+.brand-sub { color: #94a3b8; font-size: 0.95rem; margin-bottom: 40px; line-height: 1.6; }
+.step-list { display: flex; flex-direction: column; gap: 22px; }
+.step { display: flex; gap: 16px; align-items: flex-start; }
+.step-num { color: #0091ff; font-size: 0.7rem; font-weight: 700; letter-spacing: 1px; padding-top: 3px; min-width: 24px; }
+.step-title { color: #fff; font-size: 0.9rem; font-weight: 600; margin-bottom: 2px; }
+.step-desc { color: #555; font-size: 0.82rem; }
 
-/* --- KANAN: SENSOR FORM (CLIP-PATH MIRING) --- */
-.hero-right {
-  flex: 1;
-  background-color: #0d0d0d;
-  clip-path: polygon(15% 0%, 100% 0%, 100% 100%, 0% 100%);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1;
-  padding-left: 5%;
-}
+.auth-right { flex: 1; position: relative; display: flex; justify-content: center; align-items: center; z-index: 1; }
+.clip-bg { position: absolute; inset: 0; background: #0d0d0d; clip-path: polygon(15% 0%, 100% 0%, 100% 100%, 0% 100%); }
+.form-card { position: relative; z-index: 2; width: 100%; max-width: 360px; padding: 0 5%; }
+.form-eyebrow { font-size: 0.65rem; letter-spacing: 4px; color: #0091ff; border-left: 2px solid #0091ff; padding-left: 8px; display: block; margin-bottom: 12px; }
+.form-title { font-size: 1.4rem; font-weight: 700; margin-bottom: 24px; }
 
-/* --- AUTH CARD --- */
-.auth-card-wrapper {
-  width: 80%;
-  max-width: 420px;
+.btn-google {
+  width: 100%; display: flex; align-items: center; justify-content: center; gap: 10px;
+  background: #1a1a1a; border: 1px solid #333; border-radius: 8px; color: #fff;
+  font-size: 0.9rem; font-weight: 500; padding: 12px 16px; cursor: pointer;
+  transition: background 0.2s, border-color 0.2s;
 }
-.auth-card {
-  background: linear-gradient(135deg, #1a1a1a 0%, #262626 100%);
-  border: 1px solid #333333;
-  border-radius: 16px;
-  padding: 40px 32px;
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
-}
-.card-title {
-  font-size: 1.5rem;
-  font-weight: 800;
-  margin: 0 0 6px 0;
-}
-.card-subtitle {
-  color: #94a3b8;
-  font-size: 0.85rem;
-  margin: 0 0 28px 0;
-}
-.form-group {
-  margin-bottom: 16px;
-}
-.form-label {
-  display: block;
-  font-size: 0.8rem;
-  color: #94a3b8;
-  margin-bottom: 6px;
-  letter-spacing: 0.3px;
-}
-.input-wrapper {
-  position: relative;
-}
-.form-input {
-  width: 100%;
-  background: #0d0d0d;
-  border: 1px solid #333333;
-  border-radius: 8px;
-  padding: 12px 14px;
-  color: #ffffff;
-  font-size: 0.9rem;
-  box-sizing: border-box;
-  outline: none;
-  transition: border-color 0.2s ease;
-}
-.form-input:focus {
-  border-color: #0091ff;
-}
-.form-input::placeholder {
-  color: #444444;
-}
-.eye-btn {
-  position: absolute;
-  right: 12px;
-  top: 50%;
-  transform: translateY(-50%);
-  background: none;
-  border: none;
-  cursor: pointer;
-  font-size: 0.9rem;
-  line-height: 1;
-}
-.form-meta {
-  margin-bottom: 20px;
-  font-size: 0.8rem;
-}
-.remember-me {
-  display: flex;
-  align-items: flex-start;
-  gap: 8px;
-  color: #94a3b8;
-  cursor: pointer;
-  line-height: 1.4;
-}
-.remember-me input {
-  margin-top: 2px;
-}
-.switch-link {
-  color: #0091ff;
-  text-decoration: none;
-}
-.switch-link:hover {
-  text-decoration: underline;
-}
-.error-text {
-  color: #ff5c5c;
-  font-size: 0.8rem;
-  margin: -8px 0 16px 0;
-}
-.success-text {
-  color: #22c55e;
-  font-size: 0.8rem;
-  margin: -8px 0 16px 0;
-}
-.submit-btn {
-  width: 100%;
-  background: #0091ff;
-  color: #ffffff;
-  border: none;
-  border-radius: 8px;
-  padding: 13px;
-  font-size: 0.9rem;
-  font-weight: 700;
-  cursor: pointer;
-  letter-spacing: 0.3px;
-  box-shadow: 0 0 20px rgba(0, 145, 255, 0.3);
-  transition: opacity 0.2s ease, transform 0.2s ease;
-}
-.submit-btn:hover {
-  transform: translateY(-1px);
-}
-.submit-btn:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-  transform: none;
-}
-.switch-auth {
-  text-align: center;
-  font-size: 0.8rem;
-  color: #94a3b8;
-  margin: 20px 0 0 0;
-}
+.btn-google:hover { background: #222; border-color: #444; }
+.divider { display: flex; align-items: center; gap: 12px; margin: 18px 0; color: #444; font-size: 0.8rem; }
+.divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: #222; }
 
-/* --- KODE ANIMASI VUE (FADE IN SLIDE UP) --- */
-.slide-up-enter-from {
-  opacity: 0;
-  transform: translateY(40px);
+.field-group { margin-bottom: 14px; }
+.field-label { display: block; font-size: 0.8rem; color: #94a3b8; margin-bottom: 6px; }
+.input-wrapper { position: relative; }
+.field-input {
+  width: 100%; background: #111; border: 1px solid #2a2a2a; border-radius: 8px;
+  color: #fff; font-size: 0.9rem; padding: 11px 14px; outline: none; box-sizing: border-box;
+  transition: border-color 0.2s;
 }
-.slide-up-enter-active {
-  transition: opacity 0.8s ease-out, transform 0.8s ease-out;
-}
-.slide-up-enter-to {
-  opacity: 1;
-  transform: translateY(0);
-}
+.field-input:focus { border-color: #0091ff; }
+.field-input::placeholder { color: #444; }
+.eye-btn { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; font-size: 0.9rem; }
 
-.slide-up-delayed-enter-from {
-  opacity: 0;
-  transform: translateY(50px);
-}
-.slide-up-delayed-enter-active {
-  transition: opacity 1s ease-out 0.3s, transform 1s ease-out 0.3s;
-}
-.slide-up-delayed-enter-to {
-  opacity: 1;
-  transform: translateY(0);
-}
+.strength-bar-wrap { display: flex; align-items: center; gap: 8px; margin-top: 6px; }
+.strength-track { flex: 1; height: 3px; background: #222; border-radius: 2px; overflow: hidden; }
+.strength-fill { height: 100%; border-radius: 2px; transition: width 0.3s, background 0.3s; }
+.strength-label { font-size: 0.75rem; min-width: 36px; }
 
-/* --- RESPONSIVE --- */
-@media (max-width: 900px) {
-  .landing-container {
-    flex-direction: column;
-  }
-  .hero-right {
-    clip-path: none;
-    padding: 60px 5%;
-  }
-  .vertical-badge {
-    display: none;
-  }
+.error-msg { color: #ff4d4f; font-size: 0.82rem; margin-bottom: 10px; }
+
+.btn-primary {
+  width: 100%; background: #0091ff; border: none; border-radius: 8px; color: #fff;
+  font-size: 0.95rem; font-weight: 600; padding: 13px; cursor: pointer; margin-top: 4px;
+  display: flex; align-items: center; justify-content: center;
+  transition: opacity 0.2s, transform 0.1s;
 }
+.btn-primary:hover:not(:disabled) { opacity: 0.88; }
+.btn-primary:active:not(:disabled) { transform: scale(0.98); }
+.btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+.spinner { width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.3); border-top-color: #fff; border-radius: 50%; animation: spin 0.7s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.register-link { text-align: center; color: #555; font-size: 0.82rem; margin-top: 18px; }
+.link-blue { color: #0091ff; text-decoration: none; margin-left: 4px; }
+.link-blue:hover { text-decoration: underline; }
+
+.slide-up-enter-from { opacity: 0; transform: translateY(40px); }
+.slide-up-enter-active { transition: opacity 0.8s ease-out, transform 0.8s ease-out; }
+.slide-up-enter-to { opacity: 1; transform: translateY(0); }
+.slide-up-delayed-enter-from { opacity: 0; transform: translateY(50px); }
+.slide-up-delayed-enter-active { transition: opacity 1s ease-out 0.3s, transform 1s ease-out 0.3s; }
+.slide-up-delayed-enter-to { opacity: 1; transform: translateY(0); }
 </style>
