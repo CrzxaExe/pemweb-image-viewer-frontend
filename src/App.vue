@@ -7,7 +7,7 @@ import { useAuthStore } from '@/stores/auth'
 const auth = useAuthStore()
 
 onMounted(() => {
-  auth.fetchSession()
+  // auth.fetchSession()
 })
 </script>
 

@@ -6,23 +6,27 @@ import { useAuthStore } from '@/stores/auth'
 const router = useRouter()
 const auth = useAuthStore()
 
-const username = ref('')
+const email = ref('')
 const password = ref('')
 const showPassword = ref(false)
 
 async function handleLogin() {
-  if (!username.value || !password.value) {
+  if (!email.value || !password.value) {
     auth.error = 'Please fill in all fields.'
     return
   }
 
-  const success = await auth.login({
-    username: username.value,
-    password: password.value,
-  })
+  const res = await fetch('https://zxfile-backend-express.vercel.app/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: "include",
+      body: JSON.stringify({ email: email.value, password: password.value }),
+    })
 
-  if (success) {
-    router.push('/home')
+  const json = await res.json()
+    
+  if(json.success) {
+    router.push("/dashboard")
   }
 }
 
@@ -66,11 +70,11 @@ const features = [
         <div class="field-group">
           <label class="field-label">Username</label>
           <input
-            v-model="username"
-            type="text"
+            v-model="email"
+            type="email"
             class="field-input"
-            placeholder="username kamu"
-            autocomplete="username"
+            placeholder="email kamu"
+            autocomplete="email"
             @keyup.enter="handleLogin"
           />
         </div>

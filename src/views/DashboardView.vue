@@ -5,7 +5,10 @@ const isLoaded = ref<boolean>(false)
 const images = ref([]);
 
 const fetchDashboard = async () => {
-  const res = await fetch("https://zxfile-backend-express.vercel.app/image/dashboard");
+  const res = await fetch("https://zxfile-backend-express.vercel.app/image/dashboard", {
+      headers: { 'Content-Type': 'application/json' },
+      credentials: "include",
+  });
   const json = await res.json()
 
   images.value = json;

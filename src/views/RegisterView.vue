@@ -33,10 +33,11 @@ async function handleRegister() {
   isLoading.value = true
   error.value = ''
   try {
-    const res = await fetch('/api/auth/register', {
+    const res = await fetch('https://zxfile-backend-express.vercel.app/user/', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name: name.value, email: email.value, password: password.value }),
+      credentials: "include",
+      body: JSON.stringify({ username: name.value, email: email.value, password: password.value }),
     })
     const data = await res.json()
     if (!res.ok) throw new Error(data.message || 'Registration failed.')
