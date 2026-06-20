@@ -1,43 +1,29 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 
 const router = useRouter()
 const auth = useAuthStore()
 
-const isLoaded = ref(true)
 const username = ref('')
 const password = ref('')
 const showPassword = ref(false)
 
-onMounted(() => {
-  isLoaded.value = true
-})
-
 async function handleLogin() {
-  if (!username.value || !password.value) {a
+  if (!username.value || !password.value) {
     auth.error = 'Please fill in all fields.'
     return
   }
 
-  // Semua logic fetch, cek error, dan simpan data login
-  // sudah ditangani di dalam store (src/stores/auth.ts).
-  // Halaman ini cukup panggil fungsinya saja.
   const success = await auth.login({
     username: username.value,
     password: password.value,
   })
 
   if (success) {
-    router.push('/home')  // Redirect ke halaman home setelah login berhasil
+    router.push('/home')
   }
-}
-
-function handleGoogleLogin() {
-  // Belum ada endpoint Google OAuth di backend saat ini.
-  // Tombol ini sengaja dinonaktifkan sampai backend menyediakannya.
-  auth.error = 'Login dengan Google belum tersedia.'
 }
 
 const features = [
@@ -52,95 +38,75 @@ const features = [
   <div class="auth-container">
     <div class="dot-grid"></div>
 
-    <!-- Left branding panel -->
     <div class="auth-left">
-      <Transition name="slide-up">
-        <div v-if="isLoaded" class="brand-block">
-          <div class="logo-box"></div>
-          <h1 class="brand-title">
-            Pix<span class="text-neon-blue">Nest</span>
-          </h1>
-          <p class="brand-sub">Your images. Everywhere. Always.</p>
+      <div class="brand-block">
+        <div class="logo-box"></div>
+        <h1 class="brand-title">
+          Pix<span class="text-neon-blue">Nest</span>
+        </h1>
+        <p class="brand-sub">Your images. Everywhere. Always.</p>
 
-          <ul class="feature-list">
-            <li v-for="f in features" :key="f">
-              <span class="check-icon">&#10003;</span>
-              {{ f }}
-            </li>
-          </ul>
-        </div>
-      </Transition>
+        <ul class="feature-list">
+          <li v-for="f in features" :key="f">
+            <span class="check-icon">&#10003;</span>
+            {{ f }}
+          </li>
+        </ul>
+      </div>
     </div>
 
-    <!-- Right form panel -->
     <div class="auth-right">
       <div class="clip-bg"></div>
-      <Transition name="slide-up-delayed">
-        <div v-if="isLoaded" class="form-card">
-          <div class="form-header">
-            <span class="form-eyebrow">WELCOME BACK</span>
-            <h2 class="form-title">Sign in to your account</h2>
-          </div>
+      <div class="form-card">
+        <div class="form-header">
+          <span class="form-eyebrow">WELCOME BACK</span>
+          <h2 class="form-title">Sign in to your account</h2>
+        </div>
 
-          <!-- Google OAuth -->
-          <button class="btn-google" @click="handleGoogleLogin" type="button">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-              <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
-              <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
-              <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/>
-              <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
-            </svg>
-            Continue with Google
-          </button>
+        <div class="field-group">
+          <label class="field-label">Username</label>
+          <input
+            v-model="username"
+            type="text"
+            class="field-input"
+            placeholder="username kamu"
+            autocomplete="username"
+            @keyup.enter="handleLogin"
+          />
+        </div>
 
-          <div class="divider"><span>or</span></div>
-
-          <!-- Form -->
-          <div class="field-group">
-            <label class="field-label">Username</label>
+        <div class="field-group">
+          <label class="field-label">
+            Password
+            <a href="#" class="forgot-link">Forgot password?</a>
+          </label>
+          <div class="input-wrapper">
             <input
-              v-model="username"
-              type="text"
+              v-model="password"
+              :type="showPassword ? 'text' : 'password'"
               class="field-input"
-              placeholder="username kamu"
-              autocomplete="username"
+              placeholder="••••••••"
+              autocomplete="current-password"
               @keyup.enter="handleLogin"
             />
+            <button class="eye-btn" type="button" @click="showPassword = !showPassword" :aria-label="showPassword ? 'Hide password' : 'Show password'">
+              {{ showPassword ? '🙈' : '👁️' }}
+            </button>
           </div>
-
-          <div class="field-group">
-            <label class="field-label">
-              Password
-              <a href="#" class="forgot-link">Forgot password?</a>
-            </label>
-            <div class="input-wrapper">
-              <input
-                v-model="password"
-                :type="showPassword ? 'text' : 'password'"
-                class="field-input"
-                placeholder="••••••••"
-                autocomplete="current-password"
-                @keyup.enter="handleLogin"
-              />
-              <button class="eye-btn" type="button" @click="showPassword = !showPassword" :aria-label="showPassword ? 'Hide password' : 'Show password'">
-                {{ showPassword ? '🙈' : '👁️' }}
-              </button>
-            </div>
-          </div>
-
-          <p v-if="auth.error" class="error-msg">{{ auth.error }}</p>
-
-          <button class="btn-primary" @click="handleLogin" :disabled="auth.loading">
-            <span v-if="auth.loading" class="spinner"></span>
-            <span v-else>Sign In</span>
-          </button>
-
-          <p class="register-link">
-            Don't have an account?
-            <router-link to="/register" class="link-blue">Create one</router-link>
-          </p>
         </div>
-      </Transition>
+
+        <p v-if="auth.error" class="error-msg">{{ auth.error }}</p>
+
+        <button class="btn-primary" @click="handleLogin" :disabled="auth.loading">
+          <span v-if="auth.loading" class="spinner"></span>
+          <span v-else>Sign In</span>
+        </button>
+
+        <p class="register-link">
+          Don't have an account?
+          <router-link to="/register" class="link-blue">Create one</router-link>
+        </p>
+      </div>
     </div>
   </div>
 </template>
@@ -253,40 +219,6 @@ const features = [
   margin-bottom: 28px;
 }
 
-/* Google button */
-.btn-google {
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  background: #1a1a1a;
-  border: 1px solid #333;
-  border-radius: 8px;
-  color: #fff;
-  font-size: 0.9rem;
-  font-weight: 500;
-  padding: 12px 16px;
-  cursor: pointer;
-  transition: background 0.2s, border-color 0.2s;
-}
-.btn-google:hover { background: #222; border-color: #444; }
-
-.divider {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin: 20px 0;
-  color: #444;
-  font-size: 0.8rem;
-}
-.divider::before, .divider::after {
-  content: '';
-  flex: 1;
-  height: 1px;
-  background: #222;
-}
-
 /* Fields */
 .field-group { margin-bottom: 16px; }
 .field-label {
@@ -372,12 +304,4 @@ const features = [
 }
 .link-blue { color: #0091ff; text-decoration: none; margin-left: 4px; }
 .link-blue:hover { text-decoration: underline; }
-
-/* Animations */
-.slide-up-enter-from { opacity: 0; transform: translateY(40px); }
-.slide-up-enter-active { transition: opacity 0.8s ease-out, transform 0.8s ease-out; }
-.slide-up-enter-to { opacity: 1; transform: translateY(0); }
-.slide-up-delayed-enter-from { opacity: 0; transform: translateY(50px); }
-.slide-up-delayed-enter-active { transition: opacity 1s ease-out 0.3s, transform 1s ease-out 0.3s; }
-.slide-up-delayed-enter-to { opacity: 1; transform: translateY(0); }
 </style>
