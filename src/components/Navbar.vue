@@ -7,9 +7,6 @@ const auth = useAuthStore()
 
 const handleLogout = async () => {
   await auth.logout()
-
-  alert('Kamu telah logout.')
-
   router.push('/')
 }
 </script>
@@ -36,8 +33,9 @@ const handleLogout = async () => {
       <!-- Menu Tengah -->
       <div class="nav-links">
 
-        <!-- Belum login -->
+        <!-- BELUM LOGIN -->
         <template v-if="!auth.isLoggedIn">
+
           <RouterLink to="/" active-class="active">
             HOME
           </RouterLink>
@@ -45,9 +43,10 @@ const handleLogout = async () => {
           <RouterLink to="/explore" active-class="active">
             EXPLORE
           </RouterLink>
+
         </template>
 
-        <!-- Sudah login -->
+        <!-- SUDAH LOGIN -->
         <template v-else>
 
           <RouterLink to="/" active-class="active">
@@ -112,27 +111,23 @@ const handleLogout = async () => {
 
 <style scoped>
 .navbar{
-  background-color:#000;
+  background:#000;
   padding:1.5rem 0;
   position:absolute;
   top:0;
   left:0;
   width:100%;
-  z-index:10;
   border-bottom:1px solid #1a1a1a;
+  z-index:10;
 }
 
 .nav-container{
   max-width:1200px;
-  margin:0 auto;
+  margin:auto;
+  padding:0 40px;
   display:flex;
   justify-content:space-between;
   align-items:center;
-  padding:0 40px;
-}
-
-.brand a{
-  text-decoration:none;
 }
 
 .logo-placeholder{
@@ -145,9 +140,6 @@ const handleLogout = async () => {
 .logo-icon{
   width:32px;
   height:32px;
-  display:flex;
-  justify-content:center;
-  align-items:center;
 }
 
 .logo-icon img{
@@ -157,9 +149,8 @@ const handleLogout = async () => {
 }
 
 .logo-text{
-  font-size:1.1rem;
   font-weight:700;
-  letter-spacing:1px;
+  font-size:1.1rem;
 }
 
 .nav-links{
@@ -172,12 +163,6 @@ const handleLogout = async () => {
   text-decoration:none;
   font-size:.8rem;
   font-weight:600;
-  letter-spacing:1px;
-  transition:.2s;
-}
-
-.nav-links a:hover{
-  color:white;
 }
 
 .active{
@@ -187,47 +172,32 @@ const handleLogout = async () => {
 .nav-actions{
   display:flex;
   gap:12px;
-  align-items:center;
 }
 
 .btn-login,
 .btn-register,
 .btn-logout{
-  text-decoration:none;
-  background:transparent;
-  font-size:.8rem;
-  font-weight:600;
-  letter-spacing:1px;
-  padding:8px 20px;
+  padding:8px 18px;
   border-radius:20px;
+  font-size:.8rem;
+  text-decoration:none;
   cursor:pointer;
-  transition:.2s;
 }
 
 .btn-login{
-  color:#0091ff;
   border:1px solid #0091ff;
-}
-
-.btn-login:hover{
-  background:rgba(0,145,255,.1);
+  color:#0091ff;
+  background:transparent;
 }
 
 .btn-register{
-  color:white;
   border:1px solid #333;
-}
-
-.btn-register:hover{
-  border-color:white;
+  color:white;
 }
 
 .btn-logout{
-  color:#ff4a4a;
   border:1px solid #ff4a4a;
-}
-
-.btn-logout:hover{
-  background:rgba(255,74,74,.1);
+  color:#ff4a4a;
+  background:transparent;
 }
 </style>
