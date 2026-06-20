@@ -2,22 +2,46 @@
 import { ref } from 'vue'
 
 const title = ref('')
-const file = ref()
+const file = ref<File | null>(null)
 
-async function uploadImage(){
+function handleFile(e:any) {
+  file.value = e.target.files[0]
+}
 
-const formData = new FormData()
+async function uploadImage() {
 
-formData.append('title',title.value)
-formData.append('image',file.value)
+  if (!title.value || !file.value) {
+    alert("Lengkapi data terlebih dahulu")
+    return
+  }
 
-await fetch('http://localhost:3000/api/upload',{
-method:'POST',
-credentials:'include',
-body:formData
-})
+  const formData = new FormData()
 
-alert("Upload berhasil")
+  formData.append('title', title.value)
+  formData.append('image', file.value)
+
+  try {
+
+    await fetch(
+      'https://zxfile-backend-express.vercel.app/api/upload',
+      {
+        method: 'POST',
+        credentials: 'include',
+        body: formData
+      }
+    )
+
+    alert("Upload berhasil")
+
+    title.value = ''
+    file.value = null
+
+  } catch (err) {
+
+    console.error(err)
+
+    alert("Upload gagal")
+  }
 }
 </script>
 
@@ -34,8 +58,9 @@ placeholder="Title"
 
 <input
 type="file"
-@change="e=>file=e.target.files[0]"
->
+accept="image/*"
+@change="handleFile"
+/>
 
 <button @click="uploadImage">
 Upload
