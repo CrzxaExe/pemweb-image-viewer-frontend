@@ -1,13 +1,14 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+import { useAuthStore } from '@/stores/auth'
 
 const router = useRouter()
+const auth = useAuthStore()
+
 const isLoaded = ref(false)
-const email = ref('')
+const username = ref('')
 const password = ref('')
-const isLoading = ref(false)
-const error = ref('')
 const showPassword = ref(false)
 
 onMounted(() => {
@@ -15,35 +16,36 @@ onMounted(() => {
 })
 
 async function handleLogin() {
-  if (!email.value || !password.value) {
-    error.value = 'Please fill in all fields.'
+  if (!username.value || !password.value) {
+    auth.error = 'Please fill in all fields.'
     return
   }
-  isLoading.value = true
-  error.value = ''
-  try {
-    const res = await fetch("https://zxfile-backend-express.vercel.app/auth/login", {
-      method: "POST",
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json' // Tells the server what format you expect back
-      },
-      body: JSON.stringify({ email: email.value, password: password.value })
-    });
-    const data = await res.json()
-    if (!res.ok) throw new Error(data.message || 'Login failed.')
-    localStorage.setItem('token', data.token)
+
+  // Semua logic fetch, cek error, dan simpan data login
+  // sudah ditangani di dalam store (src/stores/auth.ts).
+  // Halaman ini cukup panggil fungsinya saja.
+  const success = await auth.login({
+    username: username.value,
+    password: password.value,
+  })
+
+  if (success) {
     router.push('/dashboard')
-  } catch (err: any) {
-    error.value = err.message
-  } finally {
-    isLoading.value = false
   }
 }
 
 function handleGoogleLogin() {
-  window.location.href = '/api/auth/google'
+  // Belum ada endpoint Google OAuth di backend saat ini.
+  // Tombol ini sengaja dinonaktifkan sampai backend menyediakannya.
+  auth.error = 'Login dengan Google belum tersedia.'
 }
+
+const features = [
+  'Store unlimited images in the cloud',
+  'Share via direct link instantly',
+  'Organize with albums & tags',
+  'Backed by Google Drive storage',
+]
 </script>
 
 <template>
@@ -95,13 +97,13 @@ function handleGoogleLogin() {
 
           <!-- Form -->
           <div class="field-group">
-            <label class="field-label">Email</label>
+            <label class="field-label">Username</label>
             <input
-              v-model="email"
-              type="email"
+              v-model="username"
+              type="text"
               class="field-input"
-              placeholder="you@example.com"
-              autocomplete="email"
+              placeholder="username kamu"
+              autocomplete="username"
               @keyup.enter="handleLogin"
             />
           </div>
@@ -126,10 +128,10 @@ function handleGoogleLogin() {
             </div>
           </div>
 
-          <p v-if="error" class="error-msg">{{ error }}</p>
+          <p v-if="auth.error" class="error-msg">{{ auth.error }}</p>
 
-          <button class="btn-primary" @click="handleLogin" :disabled="isLoading">
-            <span v-if="isLoading" class="spinner"></span>
+          <button class="btn-primary" @click="handleLogin" :disabled="auth.loading">
+            <span v-if="auth.loading" class="spinner"></span>
             <span v-else>Sign In</span>
           </button>
 
@@ -142,15 +144,6 @@ function handleGoogleLogin() {
     </div>
   </div>
 </template>
-
-<script lang="ts">
-const features = [
-  'Store unlimited images in the cloud',
-  'Share via direct link instantly',
-  'Organize with albums & tags',
-  'Backed by Google Drive storage',
-]
-</script>
 
 <style scoped>
 .auth-container {
