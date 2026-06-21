@@ -1,5 +1,4 @@
 <script setup lang="ts">
-// Tidak memerlukan state reaktif isLoaded atau lifecycle hook untuk animasi lagi
 </script>
 
 <template>
@@ -36,8 +35,8 @@
       <div class="stacked-gallery">
         
         <div class="main-image-wrapper">
-          <div class="image-placeholder main-pic">
-            <span>MAIN IMAGE PLACEHOLDER</span>
+          <div class="image-placeholder main-pic overflow-hidden">
+            <img src="https://zxfile.vercel.app/q/Jg8hsObEiiXOXmKwnM" alt="Example" class="object-cover w-full h-full">
           </div>
         </div>
 

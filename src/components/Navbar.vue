@@ -6,6 +6,13 @@ const router = useRouter()
 const auth = useAuthStore()
 
 const handleLogout = async () => {
+  const res = await fetch("https://zxfile.vercel.app/auth/logout", {
+      method: "POST",
+      headers: { 'Content-Type': 'application/json' },
+      credentials: "include",
+  })
+  if (res.ok)
+
   await auth.logout()
   router.push('/')
 }
@@ -17,7 +24,7 @@ const handleLogout = async () => {
 
       <!-- Logo -->
       <div class="brand">
-        <RouterLink to="/home">
+        <RouterLink to="/">
           <div class="logo-placeholder">
             <span class="logo-text">
               Zxfile

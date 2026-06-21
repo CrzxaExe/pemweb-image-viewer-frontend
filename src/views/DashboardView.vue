@@ -12,7 +12,7 @@ const isLoaded = ref<boolean>(false)
 const images = ref<Image[]>([]);
 
 const fetchDashboard = async () => {
-  const res = await fetch("https://zxfile-backend-express.vercel.app/image/dashboard", {
+  const res = await fetch("https://zxfile.vercel.app/image/dashboard", {
       headers: { 'Content-Type': 'application/json' },
       credentials: "include",
   });
@@ -45,7 +45,7 @@ const copyLink = (url: string) => {
         
         <header class="dash-header">
           <div>
-            <h1>Your Gallery</h1>
+            <h1>Dashboard</h1>
             <p class="text-muted">Manajemen seluruh berkas gambar yang telah kamu unggah ke server.</p>
           </div>
           <div class="header-stats">Total: {{ images.length }} Images</div>

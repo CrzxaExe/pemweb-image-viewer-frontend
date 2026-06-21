@@ -33,7 +33,7 @@ async function handleRegister() {
   isLoading.value = true
   error.value = ''
   try {
-    const res = await fetch('https://zxfile-backend-express.vercel.app/user/', {
+    const res = await fetch('https://zxfile.vercel.app/user/', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       credentials: "include",

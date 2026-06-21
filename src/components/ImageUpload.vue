@@ -20,7 +20,7 @@ const handleUpload = async () => {
   formData.append('image', selectedFile.value)
 
   try {
-    await axios.post('https://zxfile-backend-express.vercel.app/drive/upload', formData, {
+    await axios.post('https://zxfile.vercel.app/drive/upload', formData, {
       headers: { 'Content-Type': 'multipart/form-data' }
     })
     selectedFile.value = null

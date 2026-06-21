@@ -3,21 +3,16 @@ import { ref, onMounted } from 'vue'
 
 const isLoaded = ref(false)
 
-type TabKey = 'profile' | 'account' | 'notifications' | 'security'
+type TabKey = 'profile' | 'account' | 'security'
 const activeTab = ref<TabKey>('profile')
 
-const fullName = ref('John Doe')
+const displayName = ref('John Doe')
 const username = ref('johndoe')
 const email = ref('john@example.com')
-const bio = ref('Photographer and visual storyteller.')
 
 const currentPassword = ref('')
 const newPassword = ref('')
 const confirmNewPassword = ref('')
-
-const emailNotifications = ref(true)
-const pushNotifications = ref(false)
-const weeklyDigest = ref(true)
 
 const isSaving = ref(false)
 const saveMessage = ref('')
@@ -61,7 +56,7 @@ async function handleSave() {
             <h1 class="main-title">
               Account <span class="text-neon-blue">Settings</span>
             </h1>
-            <p class="sub-title">Kelola profil, keamanan, dan preferensi notifikasi Anda.</p>
+            <p class="sub-title">Kelola profil Anda.</p>
           </div>
         </div>
 
@@ -82,13 +77,6 @@ async function handleSave() {
               @click="setTab('account')"
             >
               Account
-            </button>
-            <button
-              class="nav-item"
-              :class="{ active: activeTab === 'notifications' }"
-              @click="setTab('notifications')"
-            >
-              Notifications
             </button>
             <button
               class="nav-item"
@@ -115,18 +103,13 @@ async function handleSave() {
               </div>
 
               <div class="form-group">
-                <label class="form-label" for="fullname">Nama Lengkap</label>
-                <input id="fullname" v-model="fullName" type="text" class="form-input" />
+                <label class="form-label" for="displayName">Nama Display</label>
+                <input id="displayName" v-model="displayName" type="text" class="form-input" />
               </div>
 
               <div class="form-group">
                 <label class="form-label" for="username">Username</label>
-                <input id="username" v-model="username" type="text" class="form-input" />
-              </div>
-
-              <div class="form-group">
-                <label class="form-label" for="bio">Bio</label>
-                <textarea id="bio" v-model="bio" class="form-input form-textarea" rows="3"></textarea>
+                <input id="username" v-model="username" disabled type="text" class="form-input" />
               </div>
             </div>
 
@@ -137,46 +120,11 @@ async function handleSave() {
                 <input id="email" v-model="email" type="email" class="form-input" />
               </div>
 
-              <div class="form-group">
-                <label class="form-label">Bahasa</label>
-                <select class="form-input form-select">
-                  <option>Bahasa Indonesia</option>
-                  <option>English</option>
-                </select>
-              </div>
-
               <div class="danger-zone">
                 <h3 class="danger-title">Danger Zone</h3>
                 <p class="danger-text">Menghapus akun akan menghilangkan semua data secara permanen.</p>
                 <button class="danger-btn">Delete Account</button>
               </div>
-            </div>
-
-            <!-- NOTIFICATIONS TAB -->
-            <div v-else-if="activeTab === 'notifications'" class="panel-content">
-              <label class="toggle-row">
-                <div>
-                  <p class="toggle-title">Email Notifications</p>
-                  <p class="toggle-desc">Terima update penting lewat email.</p>
-                </div>
-                <input v-model="emailNotifications" type="checkbox" class="toggle-input" />
-              </label>
-
-              <label class="toggle-row">
-                <div>
-                  <p class="toggle-title">Push Notifications</p>
-                  <p class="toggle-desc">Terima notifikasi langsung di perangkat Anda.</p>
-                </div>
-                <input v-model="pushNotifications" type="checkbox" class="toggle-input" />
-              </label>
-
-              <label class="toggle-row">
-                <div>
-                  <p class="toggle-title">Weekly Digest</p>
-                  <p class="toggle-desc">Ringkasan aktivitas mingguan.</p>
-                </div>
-                <input v-model="weeklyDigest" type="checkbox" class="toggle-input" />
-              </label>
             </div>
 
             <!-- SECURITY TAB -->

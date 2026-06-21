@@ -20,7 +20,7 @@ async function handleLogin() {
   auth.error = ''
 
   try {
-    const res = await fetch('https://zxfile-backend-express.vercel.app/auth/login', {
+    const res = await fetch('https://zxfile.vercel.app/auth/login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       credentials: 'include',
