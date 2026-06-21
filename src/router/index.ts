@@ -15,7 +15,7 @@ const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     {
-      path: "/",
+      path: "/login",
       name: "login",
       component: LoginView,
     },
@@ -25,7 +25,7 @@ const router = createRouter({
       component: RegisterView,
     },
     {
-      path: "/home",
+      path: "/",
       name: "home",
       component: HomeView,
     },
@@ -58,29 +58,25 @@ const router = createRouter({
       component: SettingsView,
       meta: { requiresAuth: true }, // Proteksi halaman
     },
-    {
-      // fallback ganti tautan /login manual ke /
-      path: "/login",
-      redirect: "/",
-    },
   ],
 });
 
 // --- NAVIGATION GUARD (PROTEKSI RUTE) ---
 router.beforeEach((to, from, next) => {
-  const auth = useAuthStore();
+  const auth = useAuthStore()
+  const isLoggedIn = auth.isLoggedIn
 
   // Jika rute membutuhkan login tapi user belum login
-  if (to.meta.requiresAuth && !auth.isLoggedIn) {
-    next({ name: "login" });
+  if (to.meta.requiresAuth && !isLoggedIn) {
+    next({ name: 'login' })
   }
   // Jika user sudah login tapi mencoba kembali ke halaman Login/Register
-  else if ((to.name === "login" || to.name === "register") && auth.isLoggedIn) {
-    next({ name: "home" });
+  else if ((to.name === 'login' || to.name === 'register') && isLoggedIn) {
+    next({ name: 'home' })
   }
   // Izinkan akses
   else {
-    next();
+    next()
   }
 });
 

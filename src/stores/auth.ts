@@ -1,41 +1,27 @@
 import { defineStore } from 'pinia'
-import { ref } from "vue";
-
-interface LoginPayload {
-  username: string
-  password: string
-}
 
 export const useAuthStore = defineStore('auth', {
   state: () => ({
-    isLoggedIn: false,
+    isLoggedIn: localStorage.getItem('auth_logged_in') === 'true',
+    username: localStorage.getItem('auth_username') ?? '',
     loading: false,
     error: '',
   }),
 
   actions: {
-    async login(data: LoginPayload) {
-      this.loading = true
-      this.error = ''
-
-      try {
-        if (data.username && data.password) {
-          this.isLoggedIn = true
-          return true
-        }
-
-        this.error = 'Username atau password salah'
-        return false
-      } catch {
-        this.error = 'Login gagal'
-        return false
-      } finally {
-        this.loading = false
-      }
+    // Dipanggil setelah backend berhasil login (cookie sudah di-set oleh server)
+    setLoggedIn(username: string) {
+      this.isLoggedIn = true
+      this.username = username
+      localStorage.setItem('auth_logged_in', 'true')
+      localStorage.setItem('auth_username', username)
     },
 
-    async logout() {
+    logout() {
       this.isLoggedIn = false
+      this.username = ''
+      localStorage.removeItem('auth_logged_in')
+      localStorage.removeItem('auth_username')
     }
   }
 })

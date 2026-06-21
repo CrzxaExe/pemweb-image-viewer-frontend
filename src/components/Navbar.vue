@@ -19,12 +19,8 @@ const handleLogout = async () => {
       <div class="brand">
         <RouterLink to="/home">
           <div class="logo-placeholder">
-            <span class="logo-icon">
-              <img src="../assets/logo.svg" alt="Logo">
-            </span>
-
             <span class="logo-text">
-              PixNest
+              Zxfile
             </span>
           </div>
         </RouterLink>
@@ -59,10 +55,6 @@ const handleLogout = async () => {
 
           <RouterLink to="/profile-settings" active-class="active">
             PROFILE SETTING
-          </RouterLink>
-
-          <RouterLink to="/settings" active-class="active">
-            SETTING
           </RouterLink>
 
         </template>

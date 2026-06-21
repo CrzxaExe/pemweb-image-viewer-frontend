@@ -1,8 +1,15 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 
+type Image = {
+  imageId: string;
+  title: string;
+  url: string;
+  createAt: string;
+}
+
 const isLoaded = ref<boolean>(false)
-const images = ref([]);
+const images = ref<Image[]>([]);
 
 const fetchDashboard = async () => {
   const res = await fetch("https://zxfile-backend-express.vercel.app/image/dashboard", {
@@ -15,21 +22,13 @@ const fetchDashboard = async () => {
   console.log(json)
 }
 
-// Data dummy daftar gambar yang sudah diupload (nanti ditarik dari API Bun)
-const uploadedImages = ref([
-  { id: 1, name: 'Project Banner.png', url: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=500', size: '1.2 MB', date: '18 Jun 2026' },
-  { id: 2, name: 'Cyberpunk Aesthetic.jpg', url: 'https://images.unsplash.com/photo-1578632767115-351597cf2477?w=500', size: '845 KB', date: '15 Jun 2026' },
-  { id: 3, name: 'Abstract Vector.svg', url: 'https://images.unsplash.com/photo-1614850523459-c2f4c699c52e?w=500', size: '45 KB', date: '10 Jun 2026' },
-  { id: 4, name: 'Minimalist Setup.png', url: 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=500', size: '2.1 MB', date: '05 Jun 2026' },
-])
-
 onMounted(async () => {
   isLoaded.value = true
 
   await fetchDashboard()
 })
 
-const deleteImage = (id: number) => {
+const deleteImage = (id: string) => {
   alert(`Hapus gambar dengan ID: ${id}`)
 }
 
@@ -49,27 +48,27 @@ const copyLink = (url: string) => {
             <h1>Your Gallery</h1>
             <p class="text-muted">Manajemen seluruh berkas gambar yang telah kamu unggah ke server.</p>
           </div>
-          <div class="header-stats">Total: {{ uploadedImages.length }} Images</div>
+          <div class="header-stats">Total: {{ images.length }} Images</div>
         </header>
 
         <div class="image-grid">
-          <div v-for="img in uploadedImages" :key="img.id" class="image-card">
+          <div v-for="img in images" :key="img.imageId" class="image-card">
             
             <div class="card-preview">
-              <img :src="img.url" :alt="img.name" loading="lazy" />
+              <img :src="'https://'+img.url" :alt="img.title" loading="lazy" />
               <div class="card-overlay">
                 <button class="btn-overlay" @click="copyLink(img.url)">🔗 Copy Link</button>
               </div>
             </div>
 
             <div class="card-info">
-              <p class="img-name" :title="img.name">{{ img.name }}</p>
+              <p class="img-name" :title="'https://'+img.url">{{ img.title }}</p>
               <div class="img-meta">
-                <span>{{ img.size }}</span>
-                <span>•</span>
-                <span>{{ img.date }}</span>
+                <span>{{ new Date(img.createAt).toLocaleTimeString() }}</span>
+                <span></span>
+                <span>{{ new Date(img.createAt).toLocaleDateString() }}</span>
               </div>
-              <button class="btn-delete" @click="deleteImage(img.id)">Hapus Berkas</button>
+              <button class="btn-delete" @click="deleteImage(img.imageId)">Hapus Berkas</button>
             </div>
 
           </div>

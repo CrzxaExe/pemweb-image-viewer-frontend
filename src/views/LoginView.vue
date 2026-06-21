@@ -16,19 +16,32 @@ async function handleLogin() {
     return
   }
 
-  const res = await fetch('https://zxfile-backend-express.vercel.app/auth/login', {
+  auth.loading = true
+  auth.error = ''
+
+  try {
+    const res = await fetch('https://zxfile-backend-express.vercel.app/auth/login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      credentials: "include",
+      credentials: 'include',
       body: JSON.stringify({ email: email.value, password: password.value }),
     })
 
-  const json = await res.json()
-    
-  if(json.success) {
-    router.push("/dashboard")
+    const json = await res.json()
+
+    if (json.success || res.ok) {
+      auth.setLoggedIn(json.username ?? '')   // simpan username dari response
+      router.push('/dashboard')
+    } else {
+      auth.error = json.message || json.error || 'Email atau password salah'
+    }
+  } catch {
+    auth.error = 'Gagal terhubung ke server. Coba lagi.'
+  } finally {
+    auth.loading = false
   }
 }
+
 
 const features = [
   'Store unlimited images in the cloud',
