@@ -37,7 +37,7 @@ async function handleRegister() {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       credentials: "include",
-      body: JSON.stringify({ username: name.value, email: email.value, password: password.value }),
+      body: JSON.stringify({ username: name.value.trim(), email: email.value.trim(), password: password.value.trim() }),
     })
     const data = await res.json()
     if (!res.ok) throw new Error(data.message || 'Registration failed.')
@@ -71,8 +71,8 @@ const strengthColor = computed(() => ['', '#ff4d4f', '#faad14', '#52c41a', '#009
     <div class="auth-left">
       <div class="brand-block">
         <div class="logo-box"></div>
-        <h1 class="brand-title">Join <span class="text-neon-blue">PixNest</span></h1>
-        <p class="brand-sub">Start hosting your images in seconds. No credit card required.</p>
+        <h1 class="brand-title">Join Zx<span class="text-neon-blue">file</span></h1>
+        <p class="brand-sub">Start hosting your images in seconds.</p>
         <div class="step-list">
           <div class="step" v-for="(s, i) in steps" :key="i">
             <span class="step-num">0{{ i + 1 }}</span>
@@ -90,11 +90,11 @@ const strengthColor = computed(() => ['', '#ff4d4f', '#faad14', '#52c41a', '#009
       <div class="form-card">
         <div class="form-header">
           <span class="form-eyebrow">CREATE ACCOUNT</span>
-          <h2 class="form-title">Get started for free</h2>
+          <h2 class="form-title">Get started</h2>
         </div>
 
         <div class="field-group">
-          <label class="field-label">Full Name</label>
+          <label class="field-label">Username</label>
           <input v-model="name" type="text" class="field-input" placeholder="John Doe" autocomplete="name" />
         </div>
         
@@ -119,7 +119,7 @@ const strengthColor = computed(() => ['', '#ff4d4f', '#faad14', '#52c41a', '#009
         
         <div class="field-group">
           <label class="field-label">Confirm Password</label>
-          <input v-model="confirmPassword" type="password" class="field-input" placeholder="Repeat password" @keyup.enter="handleRegister" />
+          <input v-model="confirmPassword" :type="showPassword ? 'text' : 'password'" class="field-input" placeholder="Repeat password" @keyup.enter="handleRegister" />
         </div>
 
         <p v-if="error" class="error-msg">{{ error }}</p>

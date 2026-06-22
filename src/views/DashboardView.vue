@@ -35,7 +35,7 @@ const isDeletingId = ref<string | null>(null)
 // Copy feedback
 const copiedId = ref<string | null>(null)
 
-const API_BASE = 'https://zxfile-backend-express.vercel.app'
+const API_BASE = 'https://zxfile.vercel.app'
 
 // --- Fetch ---
 const fetchImages = async () => {
@@ -44,13 +44,13 @@ const fetchImages = async () => {
     const res = await api(`/image/user/${auth.username}`)
     if (!res.ok) {
       const json = await res.json()
-      fetchError.value = json.error ?? 'Gagal mengambil data'
+      fetchError.value = json.error ?? 'Failed to fetch'
       return
     }
     const json = await res.json()
     images.value = Array.isArray(json) ? json : []
   } catch (e) {
-    fetchError.value = 'Tidak dapat terhubung ke server'
+    fetchError.value = 'Cannnot connect to server'
   }
 }
 
@@ -98,7 +98,7 @@ const saveEdit = async () => {
     const json = await res.json()
 
     if (!res.ok) {
-      editError.value = json.error ?? 'Gagal menyimpan'
+      editError.value = json.error ?? 'Failed to save'
       return
     }
 
@@ -108,7 +108,7 @@ const saveEdit = async () => {
 
     closeEdit()
   } catch {
-    editError.value = 'Terjadi kesalahan jaringan'
+    editError.value = 'A network error occured'
   } finally {
     isSavingEdit.value = false
   }
@@ -155,7 +155,7 @@ const confirmDelete = async () => {
         <header class="dash-header">
           <div>
             <h1>Your Gallery</h1>
-            <p class="text-muted">Kelola seluruh gambar yang telah kamu unggah.</p>
+            <p class="text-muted">Manage all the images you've uploaded.</p>
           </div>
           <div class="header-stats">Total: {{ images.length }} Images</div>
         </header>
@@ -168,7 +168,7 @@ const confirmDelete = async () => {
         <!-- Empty -->
         <div v-else-if="images.length === 0" class="empty-state">
           <div class="empty-icon">🖼️</div>
-          <p>Belum ada gambar. <a href="/upload" class="link-blue">Upload sekarang</a></p>
+          <p>This place empty. <a href="/upload" class="link-blue">Upload now</a></p>
         </div>
 
         <!-- Grid -->
@@ -218,7 +218,7 @@ const confirmDelete = async () => {
       <div v-if="editModalOpen" class="modal-backdrop" @click.self="closeEdit">
         <div class="modal-box">
           <div class="modal-header">
-            <h2 class="modal-title">Edit Gambar</h2>
+            <h2 class="modal-title">Edit Image</h2>
             <button class="modal-close" @click="closeEdit">✕</button>
           </div>
 
@@ -231,12 +231,12 @@ const confirmDelete = async () => {
           />
 
           <div class="modal-body">
-            <label class="field-label">Judul</label>
+            <label class="field-label">Title</label>
             <input
               v-model="editTitle"
               class="field-input"
               type="text"
-              placeholder="Judul gambar..."
+              placeholder="Image title..."
               maxlength="100"
               @keyup.enter="saveEdit"
             />
@@ -244,14 +244,14 @@ const confirmDelete = async () => {
           </div>
 
           <div class="modal-footer">
-            <button class="btn-cancel" @click="closeEdit">Batal</button>
+            <button class="btn-cancel" @click="closeEdit">Cancel</button>
             <button
               class="btn-save"
               :disabled="isSavingEdit || !editTitle.trim()"
               @click="saveEdit"
             >
               <span v-if="isSavingEdit" class="btn-spinner"></span>
-              <span v-else>Simpan</span>
+              <span v-else>Save</span>
             </button>
           </div>
         </div>
@@ -263,20 +263,19 @@ const confirmDelete = async () => {
       <div v-if="deleteModalOpen" class="modal-backdrop" @click.self="closeDelete">
         <div class="modal-box modal-box--danger">
           <div class="modal-header">
-            <h2 class="modal-title">Hapus Gambar?</h2>
+            <h2 class="modal-title">Delete the image?</h2>
             <button class="modal-close" @click="closeDelete">✕</button>
           </div>
 
           <div class="modal-body">
             <p class="delete-msg">
-              Gambar <strong>{{ deleteTarget?.title }}</strong> akan dihapus secara permanen dari
-              galeri. Tindakan ini tidak bisa dibatalkan.
+              <strong>{{ deleteTarget?.title }}</strong> will be permanently deleted from the gallery. This action cannot be undone.
             </p>
           </div>
 
           <div class="modal-footer">
-            <button class="btn-cancel" @click="closeDelete">Batal</button>
-            <button class="btn-danger-confirm" @click="confirmDelete">Ya, Hapus</button>
+            <button class="btn-cancel" @click="closeDelete">Cancel</button>
+            <button class="btn-danger-confirm" @click="confirmDelete">Yes, Delete It</button>
           </div>
         </div>
       </div>

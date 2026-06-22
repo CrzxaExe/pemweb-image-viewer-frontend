@@ -59,9 +59,9 @@ const features = [
       <div class="brand-block">
         <div class="logo-box"></div>
         <h1 class="brand-title">
-          Pix<span class="text-neon-blue">Nest</span>
+          Zx<span class="text-neon-blue">File</span>
         </h1>
-        <p class="brand-sub">Your images. Everywhere. Always.</p>
+        <p class="brand-sub">Image Everywhere for Everyone</p>
 
         <ul class="feature-list">
           <li v-for="f in features" :key="f">
@@ -81,7 +81,7 @@ const features = [
         </div>
 
         <div class="field-group">
-          <label class="field-label">Username</label>
+          <label class="field-label">Email</label>
           <input
             v-model="email"
             type="email"

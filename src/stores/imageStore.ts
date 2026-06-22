@@ -23,7 +23,7 @@ export const useImageStore = defineStore("image", {
         );
         this.images = response.data;
       } catch (error) {
-        console.error("Gagal mengambil gambar:", error);
+        console.error("Failed to get images:", error);
       } finally {
         this.loading = false;
       }

@@ -10,7 +10,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <div v-if="imageStore.loading" class="loading">Memuat galeri...</div>
+  <div v-if="imageStore.loading" class="loading">Loading Gallery...</div>
   
   <div v-else class="grid">
     <div v-for="img in imageStore.images" :key="img.id" class="card">

@@ -1,7 +1,8 @@
 <script setup lang="ts">
+import { api } from '@/api'
 import { ref, onMounted } from 'vue'
 
-const API_BASE = 'https://zxfile-backend-express.vercel.app'
+const API_BASE = 'https://zxfile.vercel.app'
 
 type ExploreImage = {
   imageId: string
@@ -19,7 +20,7 @@ const imageUrl = (id: string) => `${API_BASE}/q/${id}`
 
 onMounted(async () => {
   try {
-    const res = await fetch(`${API_BASE}/image/explore`)
+    const res = await api(`/image/explore`)
     if (!res.ok) throw new Error('Gagal mengambil data')
     const json = await res.json()
     images.value = Array.isArray(json) ? json : []
@@ -41,7 +42,7 @@ const formatDate = (iso: string) =>
     <div class="hero">
       <div class="hero-glow"></div>
       <h1 class="hero-title">Explore <span class="text-blue">Gallery</span></h1>
-      <p class="hero-sub">Temukan gambar terbaru yang dibagikan oleh komunitas.</p>
+      <p class="hero-sub">Discover the latest images shared by the community.</p>
     </div>
 
     <div class="content">
@@ -63,7 +64,7 @@ const formatDate = (iso: string) =>
       <!-- Empty -->
       <div v-else-if="images.length === 0" class="status-box empty">
         <div class="empty-icon">🖼️</div>
-        <p>Belum ada gambar yang dipublikasikan.</p>
+        <p>No images have been published yet.</p>
       </div>
 
       <!-- Grid -->
@@ -97,7 +98,7 @@ const formatDate = (iso: string) =>
 
       <!-- Count -->
       <p v-if="!isLoading && images.length > 0" class="count-label">
-        Menampilkan {{ images.length }} gambar terbaru
+        Showing the {{ images.length }} most recent images.
       </p>
 
     </div>

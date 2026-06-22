@@ -24,8 +24,8 @@
         </p>
 
         <div class="bg-watermark">
-          <h2>INSERT TEXT</h2>
-          <h2>INSERT TEXT</h2>
+          <h2>SHARE IMAGE</h2>
+          <h2>WITH OTHERS</h2>
         </div>
       </div>
     </div>
@@ -36,7 +36,7 @@
         
         <div class="main-image-wrapper">
           <div class="image-placeholder main-pic overflow-hidden">
-            <img src="https://zxfile.vercel.app/q/Jg8hsObEiiXOXmKwnM" alt="Example" class="object-cover w-full h-full">
+            <img src="https://zxfile.vercel.app/q/Jg8hsObEiiXOXmKwnM" alt="Display0" class="object-cover w-full h-full">
           </div>
         </div>
 

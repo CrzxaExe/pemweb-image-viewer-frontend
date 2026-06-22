@@ -1,4 +1,4 @@
-import { createRouter, createWebHistory } from "vue-router";
+import { createRouter, createWebHashHistory } from "vue-router";
 import { useAuthStore } from "@/stores/auth";
 
 // Import Views
@@ -12,7 +12,7 @@ import ProfileSettingsView from "../views/ProfileSettingsView.vue";
 import SettingsView from "../views/SettingsView.vue";
 
 const router = createRouter({
-  history: createWebHistory(import.meta.env.BASE_URL),
+  history: createWebHashHistory(import.meta.env.BASE_URL),
   routes: [
     {
       path: "/login",
@@ -63,20 +63,20 @@ const router = createRouter({
 
 // --- NAVIGATION GUARD (PROTEKSI RUTE) ---
 router.beforeEach((to, from, next) => {
-  const auth = useAuthStore()
-  const isLoggedIn = auth.isLoggedIn
+  const auth = useAuthStore();
+  const isLoggedIn = auth.isLoggedIn;
 
   // Jika rute membutuhkan login tapi user belum login
   if (to.meta.requiresAuth && !isLoggedIn) {
-    next({ name: 'login' })
+    next({ name: "login" });
   }
   // Jika user sudah login tapi mencoba kembali ke halaman Login/Register
-  else if ((to.name === 'login' || to.name === 'register') && isLoggedIn) {
-    next({ name: 'home' })
+  else if ((to.name === "login" || to.name === "register") && isLoggedIn) {
+    next({ name: "home" });
   }
   // Izinkan akses
   else {
-    next()
+    next();
   }
 });
 

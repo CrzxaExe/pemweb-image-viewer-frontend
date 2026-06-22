@@ -32,12 +32,12 @@ const canSubmit = computed(() =>
 
 const statusText = computed(() => {
   switch (phase.value) {
-    case 'idle': return 'Pilih atau drop gambar untuk mulai'
-    case 'uploading-drive': return 'Mengupload ke Google Drive...'
-    case 'drive-ready': return 'Gambar siap. Isi judul lalu tekan Kirim.'
-    case 'submitting': return 'Menyimpan metadata...'
-    case 'done': return 'Upload berhasil! 🎉'
-    case 'error': return errorMsg.value || 'Terjadi kesalahan'
+    case 'idle': return 'Select or drag and drop an image to get started'
+    case 'uploading-drive': return 'Uploading to image to server...'
+    case 'drive-ready': return 'Image ready.'
+    case 'submitting': return 'Saving Image...'
+    case 'done': return 'Upload successful! 🎉'
+    case 'error': return errorMsg.value || 'An error occurred'
     default: return ''
   }
 })
@@ -63,7 +63,7 @@ function onFileInput(e: Event) {
 
 function processFile(file: File) {
   if (!file.type.startsWith('image/')) {
-    errorMsg.value = 'Hanya file gambar yang diizinkan'
+    errorMsg.value = 'Only image files are allowed'
     phase.value = 'error'
     return
   }
@@ -92,13 +92,13 @@ async function uploadToDrive(file: File) {
     const json = await res.json()
 
     if (!res.ok) {
-      throw new Error(json.error ?? 'Upload ke Drive gagal')
+      throw new Error(json.error ?? 'Upload image to server error')
     }
 
     // Response: { files: [{ original: { id: "..." }, optimized: { id: "..." } }] }
     const uploaded = json.files?.[0]
     if (!uploaded?.original?.id || !uploaded?.optimized?.id) {
-      throw new Error('Response Drive tidak valid')
+      throw new Error('Server response is invalid')
     }
 
     driveImageId.value = uploaded.original.id
@@ -106,7 +106,7 @@ async function uploadToDrive(file: File) {
     phase.value = 'drive-ready'
 
   } catch (err: any) {
-    errorMsg.value = err.message ?? 'Gagal upload ke Drive'
+    errorMsg.value = err.message ?? 'Failed to upload to server'
     phase.value = 'error'
   }
 }
@@ -131,7 +131,7 @@ async function submitMetadata() {
     const json = await res.json()
 
     if (!res.ok) {
-      throw new Error(json.error ?? 'Gagal menyimpan metadata')
+      throw new Error(json.error ?? 'Failed to save image')
     }
 
     phase.value = 'done'
@@ -140,7 +140,7 @@ async function submitMetadata() {
     setTimeout(() => router.push('/dashboard'), 1500)
 
   } catch (err: any) {
-    errorMsg.value = err.message ?? 'Terjadi kesalahan'
+    errorMsg.value = err.message ?? 'An error occurred'
     phase.value = 'error'
   }
 }
@@ -163,8 +163,8 @@ function resetForm() {
 
       <!-- Header -->
       <div class="page-header">
-        <h1>Upload Gambar</h1>
-        <p class="subtitle">Gambar dikirim ke Drive saat dipilih. Isi judul lalu tekan Kirim.</p>
+        <h1>Upload Image</h1>
+        <p class="subtitle">Enter a title, image, and then click Send.</p>
       </div>
 
       <div class="upload-layout">
@@ -192,20 +192,20 @@ function resetForm() {
             <div class="drop-overlay" :class="{ 'show': !previewUrl || isDragging }">
               <template v-if="phase === 'idle' || (isDragging && phase !== 'uploading-drive')">
                 <div class="drop-icon">🖼️</div>
-                <p class="drop-text">Drop gambar di sini</p>
-                <p class="drop-sub">atau klik untuk memilih file</p>
+                <p class="drop-text">Drop the image here</p>
+                <p class="drop-sub">or click to select a file</p>
               </template>
             </div>
 
             <!-- Uploading spinner overlay -->
             <div v-if="phase === 'uploading-drive'" class="spinner-overlay">
               <div class="spinner"></div>
-              <p>Mengupload ke Drive...</p>
+              <p>Upload to server...</p>
             </div>
 
             <!-- Ready badge -->
             <div v-if="phase === 'drive-ready'" class="ready-badge">
-              ✓ Siap
+              ✓ Ready
             </div>
           </div>
 
@@ -235,12 +235,12 @@ function resetForm() {
 
           <!-- Title input -->
           <div class="field-group">
-            <label class="field-label">Judul Gambar</label>
+            <label class="field-label">Image Title</label>
             <input
               v-model="title"
               class="field-input"
               type="text"
-              placeholder="Masukkan judul gambar..."
+              placeholder="Insert image title..."
               :disabled="phase === 'submitting' || phase === 'done'"
               maxlength="100"
             />
@@ -259,7 +259,7 @@ function resetForm() {
           </div>
 
           <!-- Drive IDs (debug/info) -->
-          <div v-if="phase === 'drive-ready'" class="drive-ids">
+          <!-- <div v-if="phase === 'drive-ready'" class="drive-ids">
             <div class="id-row">
               <span class="id-label">Drive ID (original)</span>
               <span class="id-value">{{ driveImageId }}</span>
@@ -268,7 +268,7 @@ function resetForm() {
               <span class="id-label">Drive ID (optimized)</span>
               <span class="id-value">{{ driveOptimizedId }}</span>
             </div>
-          </div>
+          </div> -->
 
           <!-- Actions -->
           <div class="actions">
@@ -278,8 +278,8 @@ function resetForm() {
               @click="submitMetadata"
             >
               <span v-if="phase === 'submitting'" class="btn-spinner"></span>
-              <span v-else-if="phase === 'done'">✓ Tersimpan</span>
-              <span v-else>Kirim</span>
+              <span v-else-if="phase === 'done'">✓ Saved</span>
+              <span v-else>Submit</span>
             </button>
 
             <button
@@ -287,7 +287,7 @@ function resetForm() {
               class="btn-reset"
               @click="resetForm"
             >
-              Upload Lain
+              Other Uploads
             </button>
           </div>
 

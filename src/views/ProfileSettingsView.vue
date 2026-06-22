@@ -59,7 +59,7 @@ const setTab = (tab: TabKey) => {
 // --- Save profile (displayName + avatarUrl) ---
 const saveProfile = async () => {
   if (!auth.userId) {
-    saveMsg.value = { type: 'error', text: 'User ID tidak ditemukan. Coba login ulang.' }
+    saveMsg.value = { type: 'error', text: 'User ID not found. Please try logging in again.' }
     return
   }
 
@@ -67,9 +67,10 @@ const saveProfile = async () => {
   saveMsg.value = null
 
   try {
-    const res = await api(`/user/${auth.userId}`, {
+    const res = await api(`/user/`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
+      credentials: "include",
       body: JSON.stringify({
         displayName: displayName.value.trim() || undefined,
         avatarUrl: avatarUrl.value.trim() || undefined,
@@ -79,12 +80,12 @@ const saveProfile = async () => {
     const json = await res.json()
 
     if (!res.ok) {
-      saveMsg.value = { type: 'error', text: json.error ?? 'Gagal menyimpan profil' }
+      saveMsg.value = { type: 'error', text: json.error ?? 'Failed to save profile' }
     } else {
-      saveMsg.value = { type: 'success', text: 'Profil berhasil diperbarui.' }
+      saveMsg.value = { type: 'success', text: 'The profile has been successfully updated.' }
     }
   } catch {
-    saveMsg.value = { type: 'error', text: 'Gagal terhubung ke server.' }
+    saveMsg.value = { type: 'error', text: 'Failed to connect to the server.' }
   } finally {
     isSaving.value = false
   }
@@ -93,19 +94,19 @@ const saveProfile = async () => {
 // --- Save password ---
 const savePassword = async () => {
   if (!newPassword.value) {
-    saveMsg.value = { type: 'error', text: 'Password baru tidak boleh kosong.' }
+    saveMsg.value = { type: 'error', text: 'The new password cannot be blank.' }
     return
   }
   if (newPassword.value.length < 8) {
-    saveMsg.value = { type: 'error', text: 'Password minimal 8 karakter.' }
+    saveMsg.value = { type: 'error', text: 'The password must be at least 8 characters long.' }
     return
   }
   if (newPassword.value !== confirmPassword.value) {
-    saveMsg.value = { type: 'error', text: 'Konfirmasi password tidak cocok.' }
+    saveMsg.value = { type: 'error', text: 'The password does not match.' }
     return
   }
   if (!auth.userId) {
-    saveMsg.value = { type: 'error', text: 'User ID tidak ditemukan. Coba login ulang.' }
+    saveMsg.value = { type: 'error', text: 'User ID not found. Please try logging in again.' }
     return
   }
 
@@ -113,23 +114,24 @@ const savePassword = async () => {
   saveMsg.value = null
 
   try {
-    const res = await api(`/user/${auth.userId}`, {
+    const res = await api(`/user/`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
+      credentials: "include",
       body: JSON.stringify({ password: newPassword.value }),
     })
 
     const json = await res.json()
 
     if (!res.ok) {
-      saveMsg.value = { type: 'error', text: json.error ?? 'Gagal memperbarui password' }
+      saveMsg.value = { type: 'error', text: json.error ?? 'Failed to update password' }
     } else {
-      saveMsg.value = { type: 'success', text: 'Password berhasil diperbarui.' }
+      saveMsg.value = { type: 'success', text: 'Your password has been successfully updated.' }
       newPassword.value = ''
       confirmPassword.value = ''
     }
   } catch {
-    saveMsg.value = { type: 'error', text: 'Gagal terhubung ke server.' }
+    saveMsg.value = { type: 'error', text: 'Failed to connect to the server.' }
   } finally {
     isSaving.value = false
   }
@@ -155,13 +157,17 @@ const handleSave = () => {
           <div class="icon-box"></div>
           <div>
             <h1 class="main-title">Account <span class="text-blue">Settings</span></h1>
-            <p class="sub-title">Kelola profil dan keamanan akun kamu.</p>
+            <p class="sub-title">Manage your profile and account security.</p>
           </div>
         </div>
 
         <!-- User pill -->
         <div class="user-pill">
-          <div class="user-avatar">{{ auth.username?.[0]?.toUpperCase() ?? '?' }}</div>
+          <div class="user-avatar avatar-circle">
+            <span v-if="!avatarUrl">{{ auth.username?.[0]?.toUpperCase() ?? '?' }}</span>
+            
+            <img v-else :src="avatarUrl" alt="Avatar" class="avatar-img">
+          </div>
           <div>
             <p class="user-name">{{ displayName || auth.username }}</p>
             <p class="user-sub">@{{ auth.username }}</p>
@@ -189,7 +195,7 @@ const handleSave = () => {
 
             <!-- PROFILE TAB -->
             <div v-if="activeTab === 'profile'" class="panel-content">
-              <div class="panel-section-title">Informasi Profil</div>
+              <div class="panel-section-title">Profile Information</div>
 
               <!-- Avatar preview -->
               <div class="avatar-row">
@@ -204,7 +210,7 @@ const handleSave = () => {
                   <span v-else class="avatar-initial">{{ auth.username?.[0]?.toUpperCase() ?? '?' }}</span>
                 </div>
                 <div class="avatar-info">
-                  <p class="avatar-hint">Masukkan URL gambar untuk foto profil</p>
+                  <p class="avatar-hint">Enter the image URL for your profile photo</p>
                   <p class="avatar-sub">Format: JPEG, PNG, WebP</p>
                 </div>
               </div>
@@ -227,10 +233,10 @@ const handleSave = () => {
                   v-model="displayName"
                   type="text"
                   class="form-input"
-                  placeholder="Nama tampilan kamu..."
+                  placeholder="Your Display Name..."
                   maxlength="50"
                 />
-                <p class="field-hint">Nama yang ditampilkan ke pengguna lain.</p>
+                <p class="field-hint">The name displayed to other users.</p>
               </div>
 
               <!-- Read-only fields -->
@@ -238,24 +244,24 @@ const handleSave = () => {
                 <div class="form-group">
                   <label class="form-label">Username</label>
                   <div class="form-readonly">{{ auth.username }}</div>
-                  <p class="field-hint">Username tidak dapat diubah.</p>
+                  <p class="field-hint">Usernames cannot be changed.</p>
                 </div>
               </div>
             </div>
 
             <!-- SECURITY TAB -->
             <div v-else class="panel-content">
-              <div class="panel-section-title">Ganti Password</div>
+              <div class="panel-section-title">Change Password</div>
 
               <div class="form-group">
-                <label class="form-label" for="new-password">Password Baru</label>
+                <label class="form-label" for="new-password">New Password</label>
                 <div class="input-wrapper">
                   <input
                     id="new-password"
                     v-model="newPassword"
                     :type="showNewPassword ? 'text' : 'password'"
                     class="form-input"
-                    placeholder="Minimal 8 karakter"
+                    placeholder="At least 8 characters"
                     autocomplete="new-password"
                   />
                   <button class="eye-btn" type="button" @click="showNewPassword = !showNewPassword">
@@ -265,14 +271,14 @@ const handleSave = () => {
               </div>
 
               <div class="form-group">
-                <label class="form-label" for="confirm-password">Konfirmasi Password Baru</label>
+                <label class="form-label" for="confirm-password">Confirm New Password</label>
                 <div class="input-wrapper">
                   <input
                     id="confirm-password"
                     v-model="confirmPassword"
                     :type="showConfirmPassword ? 'text' : 'password'"
                     class="form-input"
-                    placeholder="Ulangi password baru"
+                    placeholder="Re-enter your new password"
                     autocomplete="new-password"
                   />
                   <button class="eye-btn" type="button" @click="showConfirmPassword = !showConfirmPassword">
@@ -287,12 +293,12 @@ const handleSave = () => {
                 class="password-match"
                 :class="newPassword === confirmPassword ? 'match' : 'no-match'"
               >
-                {{ newPassword === confirmPassword ? '✓ Password cocok' : '✗ Password tidak cocok' }}
+                {{ newPassword === confirmPassword ? '✓ Password match' : '✗ Password does not match' }}
               </div>
 
               <div class="security-note">
                 <span class="note-icon">ℹ</span>
-                Password baru minimal 8 karakter. Kamu tidak perlu memasukkan password lama.
+                The new password must be at least 8 characters long. You do not need to enter your old password.
               </div>
             </div>
 
@@ -311,7 +317,7 @@ const handleSave = () => {
                 @click="handleSave"
               >
                 <span v-if="isSaving" class="btn-spinner"></span>
-                <span v-else>Simpan Perubahan</span>
+                <span v-else>Save Changes</span>
               </button>
             </div>
 

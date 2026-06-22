@@ -36,7 +36,7 @@ const handleUpload = async () => {
 <template>
   <div class="upload-box">
     <input type="file" @change="onFileChange" accept="image/*" />
-    <button @click="handleUpload" :disabled="!selectedFile">Unggah Gambar</button>
+    <button @click="handleUpload" :disabled="!selectedFile">Upload Picture</button>
   </div>
 </template>
 
