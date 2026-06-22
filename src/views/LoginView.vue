@@ -30,7 +30,7 @@ async function handleLogin() {
     const json = await res.json()
 
     if (json.success || res.ok) {
-      auth.setLoggedIn(json.username ?? '')   // simpan username dari response
+      auth.setLoggedIn(json.username ?? '', json.userId ?? '')   // simpan username + userId
       router.push('/dashboard')
     } else {
       auth.error = json.message || json.error || 'Email atau password salah'

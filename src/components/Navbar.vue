@@ -11,10 +11,10 @@ const handleLogout = async () => {
       headers: { 'Content-Type': 'application/json' },
       credentials: "include",
   })
-  if (res.ok)
-
-  await auth.logout()
-  router.push('/')
+  if (res.ok) { 
+    auth.logout()
+    router.push('/')
+  }
 }
 </script>
 
