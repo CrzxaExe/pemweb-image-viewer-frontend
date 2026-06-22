@@ -104,7 +104,7 @@ const saveEdit = async () => {
 
     // Update locally
     const idx = images.value.findIndex(i => i.imageId === editTarget.value!.imageId)
-    if (idx !== -1) images.value[idx].title = editTitle.value.trim()
+    if (idx !== -1) images.value[idx]!.title = editTitle.value.trim()
 
     closeEdit()
   } catch {

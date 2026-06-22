@@ -6,12 +6,17 @@ const router = useRouter()
 const auth = useAuthStore()
 
 const handleLogout = async () => {
-  const res = await fetch("https://zxfile.vercel.app/auth/logout", {
+  try {
+    const res = await fetch("https://zxfile-backend-express.vercel.app/auth/logout", {
       method: "POST",
       headers: { 'Content-Type': 'application/json' },
       credentials: "include",
-  })
-  if (res.ok) { 
+    })
+    // Regardless of server response, clear local state so user is logged out
+    auth.logout()
+    router.push('/')
+  } catch {
+    // Network error — still clear local state
     auth.logout()
     router.push('/')
   }
@@ -39,7 +44,7 @@ const handleLogout = async () => {
         <!-- BELUM LOGIN -->
         <template v-if="!auth.isLoggedIn">
 
-          <RouterLink to="/home" active-class="active">
+          <RouterLink to="/" active-class="active">
             HOME
           </RouterLink>
 
@@ -51,6 +56,10 @@ const handleLogout = async () => {
 
         <!-- SUDAH LOGIN -->
         <template v-else>
+
+          <RouterLink to="/explore" active-class="active">
+            EXPLORE
+          </RouterLink>
 
           <RouterLink to="/upload" active-class="active">
             UPLOAD
