@@ -41,9 +41,15 @@
         </div>
 
         <div class="thumbnail-row">
-          <div class="image-placeholder thumb-pic"><span>THUMB 1</span></div>
-          <div class="image-placeholder thumb-pic"><span>THUMB 2</span></div>
-          <div class="image-placeholder thumb-pic"><span>THUMB 3</span></div>
+          <div class="image-placeholder thumb-pic">
+            <img src="https://zxfile.vercel.app/q/ep5H9OKdw7ufkiU8Xb" alt="Display1" class="object-cover w-full h-full">
+          </div>
+          <div class="image-placeholder thumb-pic">
+            <img src="https://zxfile.vercel.app/q/X1wtQASCVZlzwDBLqk" alt="Display2" class="object-cover w-full h-full">
+          </div>
+          <div class="image-placeholder thumb-pic">
+            <img src="https://zxfile.vercel.app/q/DNQjWs52iqpEyGbwyk" alt="Display3" class="object-cover w-full h-full">
+          </div>
         </div>
 
       </div>

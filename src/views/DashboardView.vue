@@ -180,7 +180,7 @@ const confirmDelete = async () => {
               <img :src="imageUrl(img)" :alt="img.title" loading="lazy" />
               <div class="card-overlay">
                 <button class="btn-overlay" @click="copyLink(img)">
-                  {{ copiedId === img.imageId ? '✓ Disalin!' : '🔗 Copy Link' }}
+                  {{ copiedId === img.imageId ? '✓ Copied!' : '🔗 Copy Link' }}
                 </button>
               </div>
             </div>

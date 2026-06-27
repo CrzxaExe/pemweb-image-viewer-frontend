@@ -10,22 +10,30 @@ type ExploreImage = {
   createAt: string
   author: string
   mimetype: string
+  visit: number
 }
 
 const images = ref<ExploreImage[]>([])
 const isLoading = ref(true)
 const error = ref('')
+const copiedId = ref<string | null>(null)
 
 const imageUrl = (id: string) => `${API_BASE}/q/${id}`
+
+const copyLink = (img: ExploreImage) => {
+  navigator.clipboard.writeText(imageUrl(img.imageId))
+  copiedId.value = img.imageId
+  setTimeout(() => { copiedId.value = null }, 2000)
+}
 
 onMounted(async () => {
   try {
     const res = await api(`/image/explore`)
-    if (!res.ok) throw new Error('Gagal mengambil data')
+    if (!res.ok) throw new Error('Failed to fetching data')
     const json = await res.json()
     images.value = Array.isArray(json) ? json : []
   } catch (e: any) {
-    error.value = e.message ?? 'Gagal memuat galeri'
+    error.value = e.message ?? 'Failed to get gallery'
   } finally {
     isLoading.value = false
   }
@@ -82,6 +90,11 @@ const formatDate = (iso: string) =>
               loading="lazy"
               class="thumb-img"
             />
+            <div class="card-overlay">
+                <button class="btn-overlay" @click="copyLink(img)">
+                  {{ copiedId === img.imageId ? '✓ Copied!' : '🔗 Copy Link' }}
+                </button>
+              </div>
           </div>
 
           <!-- Info -->
@@ -220,6 +233,7 @@ const formatDate = (iso: string) =>
 }
 
 .card-thumb {
+  position: relative;
   width: 100%;
   height: 185px;
   background: #0d0d0d;
@@ -231,6 +245,30 @@ const formatDate = (iso: string) =>
   transition: transform 0.35s ease;
 }
 .image-card:hover .thumb-img { transform: scale(1.06); }
+.card-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+.card-thumb:hover .card-overlay { opacity: 1; }
+
+.btn-overlay {
+  background: #fff;
+  color: #000;
+  border: none;
+  padding: 7px 14px;
+  border-radius: 8px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.1s;
+}
+.btn-overlay:hover { transform: scale(1.05); }
 
 .card-info {
   padding: 13px 14px 14px;
