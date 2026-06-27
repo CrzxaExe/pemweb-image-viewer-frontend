@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
+import { apiPost } from '@/api'
 
 const router = useRouter()
 const name = ref('')
@@ -33,11 +34,10 @@ async function handleRegister() {
   isLoading.value = true
   error.value = ''
   try {
-    const res = await fetch('https://zxfile.vercel.app/user/', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      credentials: "include",
-      body: JSON.stringify({ username: name.value.trim(), email: email.value.trim(), password: password.value.trim() }),
+    const res = await apiPost('/user/', {
+      username: name.value.trim(),
+      email: email.value.trim(),
+      password: password.value.trim(),
     })
     const data = await res.json()
     if (!res.ok) throw new Error(data.message || 'Registration failed.')

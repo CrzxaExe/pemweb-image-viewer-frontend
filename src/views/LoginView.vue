@@ -2,6 +2,7 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
+import { apiPost } from '@/api'
 
 const router = useRouter()
 const auth = useAuthStore()
@@ -20,17 +21,15 @@ async function handleLogin() {
   auth.error = ''
 
   try {
-    const res = await fetch('https://zxfile.vercel.app/auth/login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      credentials: 'include',
-      body: JSON.stringify({ email: email.value, password: password.value }),
+    const res = await apiPost('/auth/login', {
+      email: email.value,
+      password: password.value,
     })
 
     const json = await res.json()
 
     if (json.success || res.ok) {
-      auth.setLoggedIn(json.username ?? '', json.userId ?? '')   // simpan username + userId
+      auth.setLoggedIn(json.username ?? '', json.userId ?? '')
       router.push('/dashboard')
     } else {
       auth.error = json.message || json.error || 'Email atau password salah'

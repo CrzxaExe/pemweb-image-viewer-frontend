@@ -7,7 +7,7 @@ const auth = useAuthStore()
 
 const handleLogout = async () => {
   try {
-    const res = await fetch("https://zxfile-backend-express.vercel.app/auth/logout", {
+    const res = await fetch("https://zxfile.vercel.app/auth/logout", {
       method: "POST",
       headers: { 'Content-Type': 'application/json' },
       credentials: "include",
